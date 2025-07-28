@@ -1,6 +1,7 @@
 {
-  "name": "next-boilerplate",
-  "version": "0.1.0",
+  "name": "ttimate",
+  "version": "1.0.0",
+  "description": "띠메이트 - 자녀와 부모의 띠 궁합 분석 서비스",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",

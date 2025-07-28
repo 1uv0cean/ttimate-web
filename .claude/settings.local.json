@@ -20,7 +20,11 @@
       "Bash(do if [ -f \"$file\" ])",
       "Bash(then sed -i 's/max-w-[0-9]*xl space-y-6 sm:space-y-8/w-full max-w-full space-y-4 sm:space-y-8 overflow-hidden/g' \"$file\")",
       "Bash(echo:*)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm type-check:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }
