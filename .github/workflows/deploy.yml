@@ -83,22 +83,22 @@ jobs:
         run: |
           # 필요한 파일만 패키징하여 업로드 속도 향상
           tar -czf ttimate-build.tar.gz \
+            --exclude='.next/cache' \
+            --exclude='node_modules' \
             .next \
             public \
             package.json \
             pnpm-lock.yaml \
-            next.config.ts \
-            --exclude='.next/cache' \
-            --exclude='node_modules'
+            next.config.ts
 
       - name: SSH 키 설정
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
+          echo "${{ secrets.SSH_ttimate }}" > ttimate.pem
+          chmod 600 ttimate.pem
 
       - name: EC2 서버 준비
         run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ttimate.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             # 애플리케이션 디렉토리 생성
             sudo mkdir -p /var/www/ttimate
             sudo chown -R $USER:$USER /var/www/ttimate
@@ -116,11 +116,11 @@ jobs:
 
       - name: 빌드 파일 업로드
         run: |
-          scp -i private_key.pem -o StrictHostKeyChecking=no ttimate-build.tar.gz ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/ttimate/
+          scp -i ttimate.pem -o StrictHostKeyChecking=no ttimate-build.tar.gz ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/ttimate/
 
       - name: EC2에서 배포 실행
         run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ttimate.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /var/www/ttimate
             
             # 새 버전 디렉토리 생성
@@ -180,7 +180,7 @@ jobs:
 
       - name: 배포 상태 확인
         run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ttimate.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             # 헬스체크
             sleep 10
             if curl -f http://localhost:3001 > /dev/null 2>&1; then
@@ -202,7 +202,7 @@ jobs:
       - name: 배포 실패 시 롤백
         if: failure()
         run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ttimate.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /var/www/ttimate
             echo "❌ 배포 실패! 이전 버전으로 롤백합니다..."
             
@@ -224,4 +224,4 @@ jobs:
       - name: 정리
         if: always()
         run: |
-          rm -f private_key.pem ttimate-build.tar.gz
+          rm -f ttimate.pem ttimate-build.tar.gz
