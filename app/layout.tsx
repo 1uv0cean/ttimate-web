@@ -98,10 +98,13 @@ const RootLayout = ({
   return (
     <html lang="ko">
       <head>
+        {/* Google AdSense 소유권 확인 */}
+        <meta name="google-adsense-account" content="ca-pub-1427543231397985" />
+        
         {/* Google AdSense */}
         <script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1427543231397985"
           crossOrigin="anonymous"
         />
 
