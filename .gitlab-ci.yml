@@ -24,7 +24,7 @@ build-next-app:
       - ttimate.tar.gz
     expire_in: 1 hour
   only:
-    - main
+    - master
 
 deploy-to-ec2:
   image: alpine
@@ -58,4 +58,4 @@ deploy-to-ec2:
         pm2 save
       EOF
   only:
-    - main
+    - master
