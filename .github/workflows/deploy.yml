@@ -24,14 +24,16 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up Node.js and pnpm
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: 'pnpm'
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -39,33 +41,32 @@ jobs:
       - name: Build Next.js app
         run: pnpm build
 
-      - name: Package build
+      - name: Package build files
         run: tar -czf ttimate-app.tar.gz .next public package.json pnpm-lock.yaml next.config.js
 
-      - name: Copy files to EC2
+      - name: Upload build to EC2
         run: |
           echo "$SSH_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
-          # Create remote directory and upload artifact
           ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST "mkdir -p $REMOTE_DIR"
           scp -i private_key.pem -o StrictHostKeyChecking=no ttimate-app.tar.gz $EC2_USER@$EC2_HOST:$REMOTE_DIR/
 
-      - name: SSH into EC2 and deploy
+      - name: Deploy on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << EOF
-            cd $REMOTE_DIR
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
+            cd /home/ubuntu/app/ttimate
             tar -xzf ttimate-app.tar.gz
             rm ttimate-app.tar.gz
 
             corepack enable
             corepack prepare pnpm@latest --activate
-            export PNPM_HOME="\$HOME/.local/share/pnpm"
-            export PATH="\$PNPM_HOME:\$PATH"
+            export PNPM_HOME="$HOME/.local/share/pnpm"
+            export PATH="$PNPM_HOME:$PATH"
 
             pnpm install --frozen-lockfile
 
             pm2 delete ttimate || true
-            pm2 start "\$PNPM_HOME/pnpm" --name ttimate -- start -- --port 3001
+            pm2 start "$PNPM_HOME/pnpm" --name ttimate -- start -- --port 3001
             pm2 save
           EOF
