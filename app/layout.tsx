@@ -16,10 +16,22 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://ttimate.com'),
   title: {
     default: '띠메이트 - 자녀와 부모의 띠 궁합',
-    template: '%s | 띠메이트'
+    template: '%s | 띠메이트',
   },
-  description: '자녀와 부모의 생년을 입력하여 띠를 확인하고 특별한 궁합을 알아보세요. 12지 띠별 성격과 궁합 분석을 통해 더 좋은 가족 관계를 만들어보세요.',
-  keywords: ['띠궁합', '띠', '12지', '궁합', '가족관계', '부모자녀', '띠운세', '띠성격', '한국전통', '십이지'],
+  description:
+    '자녀와 부모의 생년을 입력하여 띠를 확인하고 특별한 궁합을 알아보세요. 12지 띠별 성격과 궁합 분석을 통해 더 좋은 가족 관계를 만들어보세요.',
+  keywords: [
+    '띠궁합',
+    '띠',
+    '12지',
+    '궁합',
+    '가족관계',
+    '부모자녀',
+    '띠운세',
+    '띠성격',
+    '한국전통',
+    '십이지',
+  ],
   authors: [{ name: '띠메이트' }],
   creator: '띠메이트',
   publisher: '띠메이트',
@@ -92,46 +104,51 @@ const RootLayout = ({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"
           crossOrigin="anonymous"
         />
-        
+
+        {/* 카카오톡 SDK */}
+        <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" async />
+
         {/* JSON-LD 구조화 데이터 */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebApplication",
-              "name": "띠메이트",
-              "description": "자녀와 부모의 띠 궁합을 분석하는 무료 서비스",
-              "url": "https://ttimate.com",
-              "applicationCategory": "EntertainmentApplication",
-              "operatingSystem": "Web Browser",
-              "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "KRW"
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: '띠메이트',
+              description: '자녀와 부모의 띠 궁합을 분석하는 무료 서비스',
+              url: 'https://ttimate.com',
+              applicationCategory: 'EntertainmentApplication',
+              operatingSystem: 'Web Browser',
+              datePublished: '2025-07-28',
+              dateModified: '2025-07-28',
+              offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'KRW',
               },
-              "author": {
-                "@type": "Organization",
-                "name": "띠메이트"
+              author: {
+                '@type': 'Organization',
+                name: '띠메이트',
               },
-              "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "reviewCount": "1250"
-              }
-            })
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.8',
+                reviewCount: '1250',
+              },
+            }),
           }}
         />
-        
+
         {/* 추가적인 메타 태그 */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="띠메이트" />
-        
+
         {/* 파비콘 */}
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        
+
         {/* 미리 연결할 도메인 */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -139,7 +156,7 @@ const RootLayout = ({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
-        
+
         {/* Google Analytics */}
         <script
           dangerouslySetInnerHTML={{

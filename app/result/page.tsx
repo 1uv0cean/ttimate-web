@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { Footer } from '@/components/ui/Footer';
 import { MetaTags } from '@/components/ui/MetaTags';
 import { Progress } from '@/components/ui/Progress';
+import { ShareModal } from '@/components/ui/ShareModal';
 import { Typography } from '@/components/ui/Typography';
 import {
   calculateCompatibility,
@@ -33,6 +34,7 @@ function ResultContent() {
   const router = useRouter();
   const [adShown, setAdShown] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   const childYear = searchParams.get('child');
   const parentYear = searchParams.get('parent');
@@ -90,26 +92,8 @@ function ResultContent() {
   const compatibility = calculateCompatibility(childInfo.animal, parentInfo.animal);
   const gradeColors = getCompatibilityColor(compatibility.grade);
 
-  const handleShare = async () => {
-    const shareData = {
-      title: '띠메이트 - 띠 궁합 결과',
-      text: `${getZodiacEmoji(childInfo.animal)} 자녀와 ${getZodiacEmoji(parentInfo.animal)} 부모의 궁합은 ${compatibility.grade}!`,
-      url: window.location.href,
-    };
-
-    if (navigator.share && navigator.canShare(shareData)) {
-      try {
-        await navigator.share(shareData);
-      } catch {
-        // Fallback: 클립보드에 URL 복사
-        navigator.clipboard.writeText(window.location.href);
-        alert('링크가 클립보드에 복사되었습니다!');
-      }
-    } else {
-      // Fallback: 클립보드에 URL 복사
-      navigator.clipboard.writeText(window.location.href);
-      alert('링크가 클립보드에 복사되었습니다!');
-    }
+  const handleShare = () => {
+    setShareModalOpen(true);
   };
 
   return (
@@ -355,6 +339,17 @@ function ResultContent() {
         </div>
       </main>
       <Footer />
+      
+      {/* 공유 모달 */}
+      <ShareModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        childYear={childYear}
+        parentYear={parentYear}
+        childAnimal={childInfo.animal}
+        parentAnimal={parentInfo.animal}
+        compatibilityGrade={compatibility.grade}
+      />
     </div>
   );
 }

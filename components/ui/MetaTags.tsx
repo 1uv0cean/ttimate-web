@@ -16,6 +16,9 @@ export const MetaTags = ({
   ogUrl
 }: MetaTagsProps) => {
   useEffect(() => {
+    // 클라이언트 사이드에서만 실행
+    if (typeof window === 'undefined') return;
+    
     // 동적으로 메타 태그 업데이트
     if (title) {
       document.title = `${title} | 띠메이트`;

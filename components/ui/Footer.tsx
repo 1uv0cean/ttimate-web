@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Typography } from './Typography';
 
 interface FooterProps {
@@ -5,8 +8,12 @@ interface FooterProps {
 }
 
 export const Footer = ({ className = '' }: FooterProps) => {
-  const currentYear = new Date().getFullYear();
-  
+  const [currentYear, setCurrentYear] = useState(2025);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
+
   return (
     <footer className={`mt-16 border-t border-pink-100 bg-white/50 py-8 text-center ${className}`}>
       <Typography variant="small" className="px-8 text-gray-400">

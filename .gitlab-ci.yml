@@ -10,14 +10,21 @@ build-next-app:
     - corepack prepare pnpm@latest --activate
     - pnpm install --frozen-lockfile
     - export ESLINT_NO_DEV_ERRORS=1
+
+    # 환경 변수 주입 (빌드 시점용)
+    - export NEXT_PUBLIC_KAKAO_KEY=$NEXT_PUBLIC_KAKAO_KEY
+    - export NEXT_PUBLIC_GOOGLE_ADSENSE_ID=$NEXT_PUBLIC_GOOGLE_ADSENSE_ID
+    - export NEXT_PUBLIC_GA_MEASUREMENT_ID=$NEXT_PUBLIC_GA_MEASUREMENT_ID
+    - export NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+
     - pnpm build
-    - tar -czf next-app.tar.gz .next public package.json pnpm-lock.yaml next.config.ts
+    - tar -czf ttimate.tar.gz .next public package.json pnpm-lock.yaml next.config.js
   artifacts:
     paths:
-      - next-app.tar.gz
+      - ttimate.tar.gz
     expire_in: 1 hour
   only:
-    - develop
+    - main
 
 deploy-to-ec2:
   image: alpine
@@ -31,24 +38,24 @@ deploy-to-ec2:
     - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
   script:
-    - scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa next-app.tar.gz ubuntu@$EC2_HOST:~/app/next/
+    - scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ttimate.tar.gz ubuntu@$EC2_HOST:~/app/ttimate/
     - |
       ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@$EC2_HOST <<'EOF'
-      mkdir -p ~/app/next
-      cd ~/app/next
-      tar -xzf next-app.tar.gz
-      rm next-app.tar.gz
+        mkdir -p ~/app/ttimate
+        cd ~/app/ttimate
+        tar -xzf ttimate.tar.gz
+        rm ttimate.tar.gz
 
-      corepack enable
-      corepack prepare pnpm@latest --activate
-      export PNPM_HOME="$HOME/.local/share/pnpm"
-      export PATH="$PNPM_HOME:$PATH"
+        corepack enable
+        corepack prepare pnpm@latest --activate
+        export PNPM_HOME="$HOME/.local/share/pnpm"
+        export PATH="$PNPM_HOME:$PATH"
 
-      pnpm install --frozen-lockfile
+        pnpm install --frozen-lockfile
 
-      pm2 delete next-app || true
-      pm2 start "$PNPM_HOME/pnpm" --name next-app -- start --port 3001
-      pm2 save
+        pm2 delete ttimate || true
+        pm2 start "$PNPM_HOME/pnpm" --name ttimate -- start -- --port 3001
+        pm2 save
       EOF
   only:
-    - develop
+    - main
