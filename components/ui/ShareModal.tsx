@@ -6,15 +6,15 @@ import { Button } from './Button';
 import { Typography } from './Typography';
 import { InterstitialAd } from './AdBanner';
 import { Copy, MessageCircle, X } from 'lucide-react';
-import { getZodiacEmoji } from '@/lib/zodiac';
+import { getZodiacEmoji, type ZodiacAnimal } from '@/lib/zodiac';
 
 interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
   childYear: string;
   parentYear: string;
-  childAnimal: string;
-  parentAnimal: string;
+  childAnimal: ZodiacAnimal;
+  parentAnimal: ZodiacAnimal;
   compatibilityGrade: string;
 }
 
