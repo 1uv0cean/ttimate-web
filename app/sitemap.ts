@@ -6,13 +6,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: new Date('2025-07-28'),
       changeFrequency: 'daily',
       priority: 1,
     },
     {
       url: `${baseUrl}/result`,
-      lastModified: new Date(),
+      lastModified: new Date('2025-07-28'),
       changeFrequency: 'hourly',
       priority: 0.8,
     },
@@ -22,7 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 }
 
 function generateYearlyPages(baseUrl: string) {
-  const currentYear = new Date().getFullYear();
+  const currentYear = 2025;
   const startYear = 1950;
   const pages = [];
   
@@ -30,7 +30,7 @@ function generateYearlyPages(baseUrl: string) {
   for (let year = startYear; year <= currentYear; year += 10) {
     pages.push({
       url: `${baseUrl}/year/${year}`,
-      lastModified: new Date(),
+      lastModified: new Date('2025-07-28'),
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     });
