@@ -85,11 +85,11 @@ jobs:
           echo "📦 패키징할 파일 확인..."
           ls -la package.json pnpm-lock.yaml next.config.ts
           ls -la .next/ public/
-          
+
           echo "📄 package.json 내용 검증:"
           echo "파일 크기: $(wc -c < package.json) bytes"
           head -3 package.json
-          
+
           tar -czf ttimate-build.tar.gz \
             --exclude='.next/cache' \
             --exclude='node_modules' \
@@ -98,9 +98,9 @@ jobs:
             package.json \
             pnpm-lock.yaml \
             next.config.ts
-          
+
           echo "✅ 패키징 완료 - 파일 크기: $(du -h ttimate-build.tar.gz | cut -f1)"
-          
+
           echo "📦 압축 파일 내용 검증:"
           tar -tzf ttimate-build.tar.gz | grep -E "(package\.json|pnpm-lock\.yaml)" || echo "⚠️ 필수 파일이 압축에 포함되지 않았습니다!"
 
@@ -148,11 +148,11 @@ jobs:
         run: |
           echo "📤 빌드 파일 업로드 중..."
           echo "파일 크기: $(du -h ttimate-build.tar.gz | cut -f1)"
-          
+
           # 재시도 로직을 포함한 SCP 업로드
           max_attempts=3
           attempt=1
-          
+
           while [ $attempt -le $max_attempts ]; do
             echo "업로드 시도 $attempt/$max_attempts"
             
@@ -296,49 +296,6 @@ jobs:
             echo "🚀 띠메이트 배포 완료!"
             echo "서버 상태:"
             pm2 list
-          EOF
-
-      - name: 배포 상태 확인
-        run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            # 헬스체크
-            sleep 10
-            if curl -f http://localhost:3001 > /dev/null 2>&1; then
-              echo "✅ 애플리케이션이 정상적으로 실행 중입니다."
-            else
-              echo "❌ 애플리케이션 실행에 문제가 있습니다."
-              pm2 logs ttimate --lines 50
-              exit 1
-            fi
-          EOF
-
-      - name: 배포 완료 알림
-        if: success()
-        run: |
-          echo "🎉 띠메이트 배포가 성공적으로 완료되었습니다!"
-          echo "사이트: ${{ secrets.NEXT_PUBLIC_SITE_URL }}"
-          echo "시간: $(date '+%Y-%m-%d %H:%M:%S')"
-
-      - name: 배포 실패 시 롤백
-        if: failure()
-        run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /var/www/ttimate
-            echo "❌ 배포 실패! 이전 버전으로 롤백합니다..."
-            
-            # 가장 최근 백업으로 롤백
-            LATEST_BACKUP=$(ls -t backup/ | head -n 1)
-            if [ -n "$LATEST_BACKUP" ]; then
-              pm2 delete ttimate 2>/dev/null || true
-              rm -rf current
-              cp -r backup/$LATEST_BACKUP current
-              cd current
-              pm2 start pnpm --name "ttimate" -- start
-              pm2 save
-              echo "✅ 롤백 완료: $LATEST_BACKUP"
-            else
-              echo "❌ 롤백할 백업이 없습니다."
-            fi
           EOF
 
       - name: 정리
