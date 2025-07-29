@@ -28,10 +28,10 @@ export async function GET(request: NextRequest) {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-            <div style={{ fontSize: 48, marginRight: 15 }}>💝</div>
-            <div style={{ color: '#ec4899' }}>띠메이트</div>
+            <div style={{ fontSize: 48, marginRight: 15, display: 'flex' }}>💝</div>
+            <div style={{ color: '#ec4899', display: 'flex' }}>띠메이트</div>
           </div>
-          <div style={{ color: '#6b7280', fontSize: 24 }}>
+          <div style={{ color: '#6b7280', fontSize: 24, display: 'flex' }}>
             자녀와 부모의 띠 궁합을 알아보세요
           </div>
         </div>
@@ -75,7 +75,6 @@ export async function GET(request: NextRequest) {
             fontFamily: 'Inter, sans-serif',
           }}
         >
-          {/* 헤더 */}
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -88,7 +87,6 @@ export async function GET(request: NextRequest) {
             <div>띠메이트</div>
           </div>
 
-          {/* 띠 정보 */}
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -105,13 +103,13 @@ export async function GET(request: NextRequest) {
               borderRadius: 20,
               border: '3px solid rgba(59, 130, 246, 0.3)'
             }}>
-              <div style={{ fontSize: 60, marginBottom: 10 }}>
+              <div style={{ fontSize: 60, marginBottom: 10, display: 'flex' }}>
                 {getZodiacEmoji(childInfo.animal).split(' ')[0]}
               </div>
-              <div style={{ fontSize: 24, fontWeight: 600, color: '#1e40af' }}>
+              <div style={{ fontSize: 24, fontWeight: 600, color: '#1e40af', display: 'flex' }}>
                 {childInfo.animal}띠 자녀
               </div>
-              <div style={{ fontSize: 18, color: '#6b7280' }}>
+              <div style={{ fontSize: 18, color: '#6b7280', display: 'flex' }}>
                 {childYear}년생
               </div>
             </div>
@@ -119,7 +117,9 @@ export async function GET(request: NextRequest) {
             <div style={{ 
               fontSize: 48, 
               color: gradeColors.accent,
-              fontWeight: 700
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center'
             }}>
               VS
             </div>
@@ -133,19 +133,18 @@ export async function GET(request: NextRequest) {
               borderRadius: 20,
               border: '3px solid rgba(147, 51, 234, 0.3)'
             }}>
-              <div style={{ fontSize: 60, marginBottom: 10 }}>
+              <div style={{ fontSize: 60, marginBottom: 10, display: 'flex' }}>
                 {getZodiacEmoji(parentInfo.animal).split(' ')[0]}
               </div>
-              <div style={{ fontSize: 24, fontWeight: 600, color: '#7c3aed' }}>
+              <div style={{ fontSize: 24, fontWeight: 600, color: '#7c3aed', display: 'flex' }}>
                 {parentInfo.animal}띠 부모
               </div>
-              <div style={{ fontSize: 18, color: '#6b7280' }}>
+              <div style={{ fontSize: 18, color: '#6b7280', display: 'flex' }}>
                 {parentYear}년생
               </div>
             </div>
           </div>
 
-          {/* 궁합 결과 */}
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column', 
@@ -160,7 +159,8 @@ export async function GET(request: NextRequest) {
               fontSize: 28, 
               fontWeight: 700,
               color: gradeColors.text,
-              marginBottom: 15
+              marginBottom: 15,
+              display: 'flex'
             }}>
               궁합 등급: {compatibility.grade}
             </div>
@@ -168,7 +168,8 @@ export async function GET(request: NextRequest) {
               fontSize: 56, 
               fontWeight: 900,
               color: gradeColors.accent,
-              marginBottom: 15
+              marginBottom: 15,
+              display: 'flex'
             }}>
               {compatibility.score}%
             </div>
@@ -176,18 +177,19 @@ export async function GET(request: NextRequest) {
               fontSize: 20,
               color: '#6b7280',
               textAlign: 'center',
-              maxWidth: 500
+              maxWidth: 500,
+              display: 'flex'
             }}>
               {compatibility.summary}
             </div>
           </div>
 
-          {/* 하단 */}
           <div style={{ 
             position: 'absolute',
             bottom: 30,
             fontSize: 16,
-            color: '#9ca3af'
+            color: '#9ca3af',
+            display: 'flex'
           }}>
             ttimate.com에서 자세한 분석 확인하기
           </div>
@@ -214,9 +216,9 @@ export async function GET(request: NextRequest) {
             fontWeight: 600,
           }}
         >
-          <div style={{ color: '#dc2626', marginBottom: 20 }}>⚠️</div>
-          <div style={{ color: '#dc2626' }}>오류가 발생했습니다</div>
-          <div style={{ color: '#6b7280', fontSize: 20, marginTop: 10 }}>
+          <div style={{ color: '#dc2626', marginBottom: 20, display: 'flex' }}>⚠️</div>
+          <div style={{ color: '#dc2626', display: 'flex' }}>오류가 발생했습니다</div>
+          <div style={{ color: '#6b7280', fontSize: 20, marginTop: 10, display: 'flex' }}>
             다시 시도해주세요
           </div>
         </div>

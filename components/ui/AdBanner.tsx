@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { LoadingAd } from './AdSenseAd';
+import { useEffect, useState, useRef } from 'react';
 import { Card } from './Card';
 import { Typography } from './Typography';
+import { AdSenseAd } from './AdSenseAd';
 
 interface AdBannerProps {
   size?: 'small' | 'medium' | 'large';
@@ -12,6 +12,14 @@ interface AdBannerProps {
   placeholder?: boolean;
 }
 
+// 광고 슬롯 정의
+const AD_SLOTS = {
+  small: '4869775532',     // 기존 로딩 광고 슬롯 재사용
+  medium: '4869775532',    // 동일한 슬롯을 다른 크기로 사용
+  large: '4869775532',     // 동일한 슬롯을 다른 크기로 사용
+  interstitial: '4869775532' // 전면 광고도 동일한 슬롯 사용
+} as const;
+
 export const AdBanner = ({
   size = 'medium',
   type = 'banner',
@@ -19,18 +27,26 @@ export const AdBanner = ({
   placeholder = false,
 }: AdBannerProps) => {
   const [adLoaded, setAdLoaded] = useState(false);
+  const adContainerRef = useRef<HTMLDivElement>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (placeholder) return;
 
-    // Google AdSense 코드 로드 시뮬레이션
-    const loadAds = () => {
-      if (typeof window !== 'undefined' && window.adsbygoogle) {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+    // 광고 로드 시뮬레이션 (실제 AdSenseAd 컴포넌트가 처리)
+    const timer = setTimeout(() => {
+      if (mountedRef.current) {
+        setAdLoaded(true);
       }
-    };
+    }, 1000);
 
-    loadAds();
+    return () => clearTimeout(timer);
   }, [placeholder]);
 
   const sizeClasses = {
@@ -56,8 +72,29 @@ export const AdBanner = ({
     );
   }
 
+  // 광고 슬롯 선택
+  const getAdSlot = () => {
+    if (type === 'interstitial') return AD_SLOTS.interstitial;
+    return AD_SLOTS[size];
+  };
+
+  // 광고 스타일 설정
+  const getAdStyle = () => {
+    const baseStyle = { display: 'block' };
+    switch (size) {
+      case 'small':
+        return { ...baseStyle, width: '320px', height: '100px' };
+      case 'medium':
+        return { ...baseStyle, width: '728px', height: '90px' };
+      case 'large':
+        return { ...baseStyle, width: '970px', height: '250px' };
+      default:
+        return baseStyle;
+    }
+  };
+
   return (
-    <div className={`${sizeClasses[size]} w-full ${className}`}>
+    <div ref={adContainerRef} className={`${sizeClasses[size]} w-full ${className}`}>
       {!adLoaded ? (
         <Card className="flex h-full items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50">
           <div className="p-4 text-center">
@@ -69,13 +106,14 @@ export const AdBanner = ({
           </div>
         </Card>
       ) : (
-        <div className="h-full w-full overflow-hidden rounded-lg border border-gray-200 bg-white">
-          {/* 광고 컨테이너 - 실제 AdSense 코드가 들어갈 곳 */}
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-r from-blue-50 to-purple-50">
-            <div className="p-4 text-center">
-              <LoadingAd />
-            </div>
-          </div>
+        <div className="h-full w-full overflow-hidden rounded-lg bg-white">
+          <AdSenseAd
+            slot={getAdSlot()}
+            format="auto"
+            responsive={true}
+            style={getAdStyle()}
+            className="w-full h-full"
+          />
         </div>
       )}
     </div>
