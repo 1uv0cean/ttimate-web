@@ -99,24 +99,64 @@ jobs:
       - name: EC2 서버 준비
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            # 디스크 공간 확인
+            echo "💾 디스크 사용량 확인:"
+            df -h /var/www/ || df -h /
+            
             # 애플리케이션 디렉토리 생성
             sudo mkdir -p /var/www/ttimate
             sudo chown -R $USER:$USER /var/www/ttimate
             
+            # 권한 확인
+            echo "🔒 디렉토리 권한 확인:"
+            ls -ld /var/www/ttimate
+            
             # 백업 디렉토리 생성
             mkdir -p /var/www/ttimate/backup
+            
+            # 임시 파일 정리 (공간 확보)
+            echo "🧹 임시 파일 정리..."
+            rm -f /var/www/ttimate/*.tar.gz
+            rm -rf /var/www/ttimate/new_version
             
             # 현재 실행 중인 앱 백업 (rollback용)
             if [ -d "/var/www/ttimate/current" ]; then
               cp -r /var/www/ttimate/current /var/www/ttimate/backup/$(date +%Y%m%d_%H%M%S)
-              # 오래된 백업 정리 (최근 5개만 유지)
-              ls -t /var/www/ttimate/backup/ | tail -n +6 | xargs -r rm -rf
+              # 오래된 백업 정리 (최근 3개만 유지 - 공간 절약)
+              ls -t /var/www/ttimate/backup/ | tail -n +4 | xargs -r rm -rf
             fi
+            
+            # 정리 후 디스크 공간 재확인
+            echo "💾 정리 후 디스크 사용량:"
+            df -h /var/www/ || df -h /
           EOF
 
       - name: 빌드 파일 업로드
         run: |
-          scp -i private_key.pem -o StrictHostKeyChecking=no ttimate-build.tar.gz ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/ttimate/
+          echo "📤 빌드 파일 업로드 중..."
+          echo "파일 크기: $(du -h ttimate-build.tar.gz | cut -f1)"
+          
+          # 재시도 로직을 포함한 SCP 업로드
+          max_attempts=3
+          attempt=1
+          
+          while [ $attempt -le $max_attempts ]; do
+            echo "업로드 시도 $attempt/$max_attempts"
+            
+            if scp -v -i private_key.pem -o StrictHostKeyChecking=no ttimate-build.tar.gz ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/ttimate/; then
+              echo "✅ 업로드 성공!"
+              break
+            else
+              echo "❌ 업로드 실패 (시도 $attempt/$max_attempts)"
+              if [ $attempt -eq $max_attempts ]; then
+                echo "최대 재시도 횟수 도달. 업로드 실패."
+                exit 1
+              fi
+              echo "5초 후 재시도..."
+              sleep 5
+              attempt=$((attempt + 1))
+            fi
+          done
 
       - name: EC2에서 배포 실행
         run: |
