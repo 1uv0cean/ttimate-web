@@ -15,15 +15,19 @@ import {
   getGradeDescription,
 } from '@/lib/compatibility';
 import { formatYear, getZodiacEmoji, getZodiacInfo } from '@/lib/zodiac';
+import { getDetailedCompatibility } from '@/lib/zodiac-detailed-compatibility';
 import {
   AlertCircle,
   ArrowLeft,
+  BookOpen,
   CheckCircle,
   Heart,
+  Info,
   Lightbulb,
   Share2,
   Sparkles,
   Star,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -45,11 +49,11 @@ function ResultContent() {
       return;
     }
 
-    // 광고 시뮬레이션 (3초 후 결과 표시)
+    // 로딩 후 결과 표시 (2초)
     const timer = setTimeout(() => {
       setAdShown(true);
       setLoading(false);
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [childYear, parentYear, router]);
@@ -74,10 +78,9 @@ function ResultContent() {
           </Typography>
           <div className="mx-auto max-w-md rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 p-8">
             <Typography variant="muted" className="text-gray-500">
-              📺 광고 영역
-              <br />
-              (Google AdSense)
+              분석 데이터를 준비하고 있습니다...
             </Typography>
+            {/* 여기에 Google AdSense 광고 코드가 삽입됩니다 */}
           </div>
           <Typography variant="small" className="mt-4 text-gray-400">
             잠시만 기다려주세요...
@@ -91,6 +94,7 @@ function ResultContent() {
   const parentInfo = getZodiacInfo(parentYearNum);
   const compatibility = calculateCompatibility(childInfo.animal, parentInfo.animal);
   const gradeColors = getCompatibilityColor(compatibility.grade);
+  const detailedCompatibility = getDetailedCompatibility(childInfo.animal, parentInfo.animal);
 
   const handleShare = () => {
     setShareModalOpen(true);
@@ -311,19 +315,105 @@ function ResultContent() {
             </ul>
           </Card>
 
-          {/* 광고 배너 */}
-          <Card className="border-dashed border-gray-300 bg-gray-50 p-6">
-            <div className="text-center">
-              <Typography variant="muted" className="mb-2 text-gray-500">
-                📺 광고
-              </Typography>
-              <div className="rounded border-2 border-dashed border-gray-200 bg-white p-8">
-                <Typography variant="small" className="text-gray-400">
-                  Google AdSense 광고 영역
-                  <br />
-                  (실제 운영 시 광고 코드가 여기에 삽입됩니다)
+          {/* 상세 궁합 분석 섹션 */}
+          {detailedCompatibility && (
+            <Card className="border-indigo-200 bg-gradient-to-r from-indigo-50 to-blue-50 p-6">
+              <div className="mb-6 flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-indigo-600" />
+                <Typography variant="h3" className="text-lg font-semibold text-indigo-800">
+                  전통 궁합 상세 분석
+                </Typography>
+                <Badge variant="secondary" className="bg-indigo-100 text-xs text-indigo-700">
+                  12지신 전통 해석
+                </Badge>
+              </div>
+
+              {/* 궁합 요약 */}
+              <div className="mb-6 rounded-lg bg-white/60 p-4 backdrop-blur-sm">
+                <div className="mb-3 flex items-center gap-2">
+                  <Users className="h-4 w-4 text-indigo-600" />
+                  <Typography variant="h4" className="font-medium text-indigo-800">
+                    궁합 개관
+                  </Typography>
+                </div>
+                <Typography className="leading-relaxed text-gray-700">
+                  {detailedCompatibility.summary}
                 </Typography>
               </div>
+
+              {/* 상세 분석 그리드 */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {/* 긍정적 측면 */}
+                <div className="rounded-lg bg-green-50/80 p-4 backdrop-blur-sm">
+                  <div className="mb-3 flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <Typography variant="h5" className="text-sm font-semibold text-green-800">
+                      긍정적 측면
+                    </Typography>
+                  </div>
+                  <Typography variant="small" className="leading-relaxed text-green-700">
+                    {detailedCompatibility.positiveAspects}
+                  </Typography>
+                </div>
+
+                {/* 주의사항 */}
+                <div className="rounded-lg bg-amber-50/80 p-4 backdrop-blur-sm">
+                  <div className="mb-3 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-amber-600" />
+                    <Typography variant="h5" className="text-sm font-semibold text-amber-800">
+                      주의사항
+                    </Typography>
+                  </div>
+                  <Typography variant="small" className="leading-relaxed text-amber-700">
+                    {detailedCompatibility.concerns}
+                  </Typography>
+                </div>
+
+                {/* 관계 개선 조언 */}
+                <div className="rounded-lg bg-purple-50/80 p-4 backdrop-blur-sm sm:col-span-2 lg:col-span-1">
+                  <div className="mb-3 flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-purple-600" />
+                    <Typography variant="h5" className="text-sm font-semibold text-purple-800">
+                      개선 조언
+                    </Typography>
+                  </div>
+                  <Typography variant="small" className="leading-relaxed text-purple-700">
+                    {detailedCompatibility.advice}
+                  </Typography>
+                </div>
+              </div>
+
+              {/* 전통 해석 안내 */}
+              <div className="mt-6 flex items-start gap-3 rounded-lg bg-white/40 p-4 backdrop-blur-sm">
+                <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-indigo-500" />
+                <div>
+                  <Typography variant="small" className="text-indigo-700">
+                    <span className="font-medium">전통 12지신 해석:</span> 이 분석은 수천 년간 전해 내려온 동양의 전통 12지신 궁합 이론에 바탕을 둔 것으로, 
+                    각 띠의 고유한 특성과 상호작용을 통해 관계의 특징을 이해하는 데 도움을 드립니다.
+                  </Typography>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* 추가 정보 섹션 */}
+          <Card className="border-blue-200 bg-blue-50 p-6">
+            <Typography variant="h3" className="mb-4 text-lg font-semibold text-blue-800">
+              띠 궁합의 의미
+            </Typography>
+            <div className="space-y-3 text-sm text-gray-700">
+              <Typography>
+                12간지 궁합은 단순히 운세를 예측하는 것이 아니라, 가족 구성원 간의 성격적 특성을 이해하고
+                서로를 존중하는 방법을 찾는 데 도움이 됩니다.
+              </Typography>
+              <Typography>
+                부모와 자녀는 각자의 띠 특성에 따라 다른 가치관과 생활 방식을 가질 수 있습니다.
+                이러한 차이를 이해하면 더 풍성하고 행복한 가족 관계를 만들어갈 수 있습니다.
+              </Typography>
+              <Typography className="mt-3 rounded-lg bg-white p-3 text-xs text-gray-600">
+                ※ 본 궁합 결과는 전통적인 12간지 해석에 기반한 것으로, 참고용으로만 활용해주세요.
+                개인의 성격과 환경에 따라 실제 관계는 다를 수 있습니다.
+              </Typography>
             </div>
           </Card>
 
