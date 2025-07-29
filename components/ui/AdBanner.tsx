@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Typography } from './Typography';
+import { LoadingAd } from './AdSenseAd';
 import { Card } from './Card';
+import { Typography } from './Typography';
 
 interface AdBannerProps {
   size?: 'small' | 'medium' | 'large';
@@ -11,11 +12,11 @@ interface AdBannerProps {
   placeholder?: boolean;
 }
 
-export const AdBanner = ({ 
-  size = 'medium', 
+export const AdBanner = ({
+  size = 'medium',
   type = 'banner',
   className = '',
-  placeholder = false 
+  placeholder = false,
 }: AdBannerProps) => {
   const [adLoaded, setAdLoaded] = useState(false);
 
@@ -24,13 +25,9 @@ export const AdBanner = ({
 
     // Google AdSense 코드 로드 시뮬레이션
     const loadAds = () => {
-      // 실제 운영 시 아래 코드 사용
-      // if (typeof window !== 'undefined' && window.adsbygoogle) {
-      //   (window.adsbygoogle = window.adsbygoogle || []).push({});
-      // }
-      
-      // 현재는 시뮬레이션
-      setTimeout(() => setAdLoaded(true), 1000);
+      if (typeof window !== 'undefined' && window.adsbygoogle) {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      }
     };
 
     loadAds();
@@ -38,36 +35,20 @@ export const AdBanner = ({
 
   const sizeClasses = {
     small: 'h-24 max-w-sm',
-    medium: 'h-32 max-w-md', 
-    large: 'h-48 max-w-2xl'
-  };
-
-  const typeConfig = {
-    banner: {
-      width: '728',
-      height: '90',
-      slot: 'banner-slot'
-    },
-    interstitial: {
-      width: '320', 
-      height: '480',
-      slot: 'interstitial-slot'
-    },
-    native: {
-      width: '300',
-      height: '250', 
-      slot: 'native-slot'
-    }
+    medium: 'h-32 max-w-md',
+    large: 'h-48 max-w-2xl',
   };
 
   if (placeholder) {
     return (
-      <Card className={`${sizeClasses[size]} w-full border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center ${className}`}>
-        <div className="text-center p-4">
-          <Typography variant="small" className="text-gray-400 mb-1">
+      <Card
+        className={`${sizeClasses[size]} flex w-full items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50 ${className}`}
+      >
+        <div className="p-4 text-center">
+          <Typography variant="small" className="mb-1 text-gray-400">
             📺 광고 영역
           </Typography>
-          <Typography variant="small" className="text-gray-400 text-xs">
+          <Typography variant="small" className="text-xs text-gray-400">
             Google AdSense ({size})
           </Typography>
         </div>
@@ -78,8 +59,8 @@ export const AdBanner = ({
   return (
     <div className={`${sizeClasses[size]} w-full ${className}`}>
       {!adLoaded ? (
-        <Card className="h-full border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center">
-          <div className="text-center p-4">
+        <Card className="flex h-full items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50">
+          <div className="p-4 text-center">
             <div className="animate-pulse">
               <Typography variant="small" className="text-gray-400">
                 광고 로딩 중...
@@ -88,30 +69,13 @@ export const AdBanner = ({
           </div>
         </Card>
       ) : (
-        <div className="h-full w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="h-full w-full overflow-hidden rounded-lg border border-gray-200 bg-white">
           {/* 광고 컨테이너 - 실제 AdSense 코드가 들어갈 곳 */}
-          <div className="h-full w-full flex items-center justify-center bg-gradient-to-r from-blue-50 to-purple-50">
-            <div className="text-center p-4">
-              <Typography variant="small" className="text-gray-600 mb-2">
-                🎯 맞춤 광고
-              </Typography>
-              <Typography variant="small" className="text-gray-500 text-xs">
-                실제 서비스에서는 여기에 광고가 표시됩니다
-              </Typography>
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-r from-blue-50 to-purple-50">
+            <div className="p-4 text-center">
+              <LoadingAd />
             </div>
           </div>
-          
-          {/* 실제 AdSense 코드 예시 (주석 처리됨) */}
-          {/*
-          <ins 
-            className="adsbygoogle"
-            style={{ display: 'block' }}
-            data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
-            data-ad-slot={typeConfig[type].slot}
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-          />
-          */}
         </div>
       )}
     </div>
@@ -125,11 +89,7 @@ interface InterstitialAdProps {
   duration?: number; // 초 단위
 }
 
-export const InterstitialAd = ({ 
-  isVisible, 
-  onClose, 
-  duration = 5 
-}: InterstitialAdProps) => {
+export const InterstitialAd = ({ isVisible, onClose, duration = 5 }: InterstitialAdProps) => {
   const [countdown, setCountdown] = useState(duration);
   const [canClose, setCanClose] = useState(false);
 
@@ -160,13 +120,13 @@ export const InterstitialAd = ({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl max-w-md w-full relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="relative w-full max-w-md rounded-lg bg-white shadow-2xl">
         {/* 닫기 버튼 */}
         {canClose && (
           <button
             onClick={onClose}
-            className="absolute top-2 right-2 w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 transition-colors"
+            className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors hover:bg-gray-300"
           >
             ✕
           </button>
@@ -174,24 +134,23 @@ export const InterstitialAd = ({
 
         {/* 카운트다운 */}
         {!canClose && (
-          <div className="absolute top-2 right-2 w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+          <div className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-pink-500 text-sm font-bold text-white">
             {countdown}
           </div>
         )}
 
         {/* 광고 내용 */}
         <div className="p-6">
-          <Typography variant="h3" className="text-center mb-4 text-gray-800">
+          <Typography variant="h3" className="mb-4 text-center text-gray-800">
             잠시만 기다려주세요
           </Typography>
-          
+
           <AdBanner size="large" type="interstitial" />
-          
-          <Typography variant="small" className="text-center mt-4 text-gray-500">
-            {canClose 
-              ? '광고 시청이 완료되었습니다. 결과를 확인하세요!' 
-              : `${countdown}초 후 결과를 볼 수 있습니다`
-            }
+
+          <Typography variant="small" className="mt-4 text-center text-gray-500">
+            {canClose
+              ? '광고 시청이 완료되었습니다. 결과를 확인하세요!'
+              : `${countdown}초 후 결과를 볼 수 있습니다`}
           </Typography>
         </div>
       </div>
@@ -202,15 +161,16 @@ export const InterstitialAd = ({
 // AdSense 스크립트 로드 함수
 export const loadAdSenseScript = () => {
   if (typeof window === 'undefined') return;
-  
+
   // 이미 로드되었는지 확인
   if (document.querySelector('script[src*="adsbygoogle.js"]')) return;
 
   const script = document.createElement('script');
   script.async = true;
-  script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID';
+  script.src =
+    'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1427543231397985';
   script.crossOrigin = 'anonymous';
-  
+
   document.head.appendChild(script);
 };
 
@@ -222,9 +182,9 @@ export const detectAdBlocker = (): Promise<boolean> => {
     adTest.className = 'adsbox';
     adTest.style.position = 'absolute';
     adTest.style.left = '-10000px';
-    
+
     document.body.appendChild(adTest);
-    
+
     setTimeout(() => {
       const isBlocked = adTest.offsetHeight === 0;
       document.body.removeChild(adTest);
