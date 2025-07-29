@@ -83,6 +83,9 @@ const HomePage = () => {
               <br />
               부모와 자녀의 특별한 궁합을 알아보세요
             </Typography>
+            <Typography variant="small" className="mt-2 text-gray-500">
+              가족 간의 이해와 소통을 돕는 전통 띠 궁합 서비스
+            </Typography>
           </div>
 
           {/* 입력 폼 */}
@@ -145,6 +148,78 @@ const HomePage = () => {
               <br />* 결과 확인을 위해 잠시 광고가 표시될 수 있습니다
             </Typography>
           </div>
+
+          {/* 서비스 소개 */}
+          <Card className="mt-8 border-gray-200 bg-gray-50 p-6">
+            <Typography
+              variant="h3"
+              className="mb-4 text-center text-lg font-semibold text-gray-700"
+            >
+              띠메이트 서비스 소개
+            </Typography>
+            <div className="space-y-3 text-sm text-gray-600">
+              <Typography>
+                띠메이트는 동양의 전통적인 12간지 띠를 기반으로 부모와 자녀 간의 성격적 조화를
+                분석하는 서비스입니다.
+              </Typography>
+              <Typography>
+                각 띠가 가진 고유한 성격적 특성과 오행(五行) 이론을 바탕으로, 가족 구성원 간의
+                관계를 더 깊이 이해하고 서로를 존중하는 데 도움을 드립니다.
+              </Typography>
+              <div className="mt-4 rounded-lg bg-white p-4">
+                <Typography variant="h4" className="mb-2 font-semibold text-gray-700">
+                  12간지란?
+                </Typography>
+                <Typography className="text-gray-600">
+                  쥐, 소, 호랑이, 토끼, 용, 뱀, 말, 양, 원숭이, 닭, 개, 돼지의 12가지 동물로
+                  이루어진 동양의 전통적인 시간 체계입니다. 각 띠는 12년 주기로 반복되며, 태어난
+                  해의 띠가 그 사람의 기본적인 성격과 기질에 영향을 준다고 여겨집니다.
+                </Typography>
+              </div>
+            </div>
+          </Card>
+
+          {/* 이용 방법 */}
+          <Card className="mt-6 border-purple-200 bg-purple-50 p-6">
+            <Typography
+              variant="h3"
+              className="mb-4 text-center text-lg font-semibold text-purple-700"
+            >
+              이용 방법
+            </Typography>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-purple-200 text-sm font-bold text-purple-700">
+                  1
+                </div>
+                <div>
+                  <Typography className="text-sm text-gray-700">
+                    자녀와 부모의 태어난 연도를 입력해주세요. (양력 기준)
+                  </Typography>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-purple-200 text-sm font-bold text-purple-700">
+                  2
+                </div>
+                <div>
+                  <Typography className="text-sm text-gray-700">
+                    '궁합 보기' 버튼을 클릭하면 자동으로 띠가 계산됩니다.
+                  </Typography>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-purple-200 text-sm font-bold text-purple-700">
+                  3
+                </div>
+                <div>
+                  <Typography className="text-sm text-gray-700">
+                    두 사람의 띠 궁합 결과와 함께 관계 개선을 위한 맞춤형 조언을 확인하세요.
+                  </Typography>
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
       </main>
       <Footer />

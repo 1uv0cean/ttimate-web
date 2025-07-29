@@ -24,7 +24,8 @@
       "Bash(pnpm dev:*)",
       "Bash(pnpm type-check:*)",
       "Bash(pnpm lint:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(pnpm build:*)"
     ],
     "deny": []
   }

@@ -45,11 +45,11 @@ function ResultContent() {
       return;
     }
 
-    // 광고 시뮬레이션 (3초 후 결과 표시)
+    // 로딩 후 결과 표시 (2초)
     const timer = setTimeout(() => {
       setAdShown(true);
       setLoading(false);
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [childYear, parentYear, router]);
@@ -74,10 +74,9 @@ function ResultContent() {
           </Typography>
           <div className="mx-auto max-w-md rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 p-8">
             <Typography variant="muted" className="text-gray-500">
-              📺 광고 영역
-              <br />
-              (Google AdSense)
+              분석 데이터를 준비하고 있습니다...
             </Typography>
+            {/* 여기에 Google AdSense 광고 코드가 삽입됩니다 */}
           </div>
           <Typography variant="small" className="mt-4 text-gray-400">
             잠시만 기다려주세요...
@@ -311,19 +310,24 @@ function ResultContent() {
             </ul>
           </Card>
 
-          {/* 광고 배너 */}
-          <Card className="border-dashed border-gray-300 bg-gray-50 p-6">
-            <div className="text-center">
-              <Typography variant="muted" className="mb-2 text-gray-500">
-                📺 광고
+          {/* 추가 정보 섹션 */}
+          <Card className="border-blue-200 bg-blue-50 p-6">
+            <Typography variant="h3" className="mb-4 text-lg font-semibold text-blue-800">
+              띠 궁합의 의미
+            </Typography>
+            <div className="space-y-3 text-sm text-gray-700">
+              <Typography>
+                12간지 궁합은 단순히 운세를 예측하는 것이 아니라, 가족 구성원 간의 성격적 특성을 이해하고
+                서로를 존중하는 방법을 찾는 데 도움이 됩니다.
               </Typography>
-              <div className="rounded border-2 border-dashed border-gray-200 bg-white p-8">
-                <Typography variant="small" className="text-gray-400">
-                  Google AdSense 광고 영역
-                  <br />
-                  (실제 운영 시 광고 코드가 여기에 삽입됩니다)
-                </Typography>
-              </div>
+              <Typography>
+                부모와 자녀는 각자의 띠 특성에 따라 다른 가치관과 생활 방식을 가질 수 있습니다.
+                이러한 차이를 이해하면 더 풍성하고 행복한 가족 관계를 만들어갈 수 있습니다.
+              </Typography>
+              <Typography className="mt-3 rounded-lg bg-white p-3 text-xs text-gray-600">
+                ※ 본 궁합 결과는 전통적인 12간지 해석에 기반한 것으로, 참고용으로만 활용해주세요.
+                개인의 성격과 환경에 따라 실제 관계는 다를 수 있습니다.
+              </Typography>
             </div>
           </Card>
 
