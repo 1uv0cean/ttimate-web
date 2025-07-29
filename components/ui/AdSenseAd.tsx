@@ -16,6 +16,9 @@ declare global {
   }
 }
 
+// 전역 광고 로드 상태 추적
+const loadedAds = new Set<string>();
+
 export const AdSenseAd: React.FC<AdSenseAdProps> = ({
   slot,
   format = 'auto',
@@ -24,11 +27,11 @@ export const AdSenseAd: React.FC<AdSenseAdProps> = ({
   style = { display: 'block' },
 }) => {
   const adRef = useRef<HTMLDivElement>(null);
-  const loadedRef = useRef(false);
+  const adId = `ad-${slot}`;
 
   useEffect(() => {
-    // 이미 로드된 경우 중복 실행 방지
-    if (loadedRef.current) return;
+    // 이미 로드된 광고 슬롯인지 확인
+    if (loadedAds.has(adId)) return;
 
     const loadAd = () => {
       try {
@@ -38,7 +41,7 @@ export const AdSenseAd: React.FC<AdSenseAdProps> = ({
           // ins 요소가 존재하고 아직 광고가 로드되지 않은 경우에만 실행
           if (insElement && !insElement.hasAttribute('data-adsbygoogle-status')) {
             (window.adsbygoogle = window.adsbygoogle || []).push({});
-            loadedRef.current = true;
+            loadedAds.add(adId);
 
             // 광고 로드 후 플레이스홀더 숨기기
             setTimeout(() => {
@@ -51,6 +54,8 @@ export const AdSenseAd: React.FC<AdSenseAdProps> = ({
         }
       } catch (error) {
         console.error('AdSense 광고 로드 중 오류:', error);
+        // 오류 발생 시에도 재시도 방지를 위해 로드됨으로 표시
+        loadedAds.add(adId);
       }
     };
 
@@ -65,13 +70,16 @@ export const AdSenseAd: React.FC<AdSenseAdProps> = ({
     // 5초 후 타임아웃
     const timeout = setTimeout(() => {
       clearInterval(checkAdSense);
+      if (!loadedAds.has(adId)) {
+        loadedAds.add(adId); // 타임아웃 시에도 재시도 방지
+      }
     }, 5000);
 
     return () => {
       clearInterval(checkAdSense);
       clearTimeout(timeout);
     };
-  }, [slot]);
+  }, [slot, adId]);
 
   return (
     <div ref={adRef} className={`adsense-container ${className}`}>
