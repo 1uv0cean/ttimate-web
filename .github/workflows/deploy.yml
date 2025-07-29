@@ -287,7 +287,7 @@ jobs:
             
             # PM2로 새 버전 시작
             cd current
-            pm2 start pnpm --name "ttimate" -- start
+            PORT=3001 pm2 start pnpm --name "ttimate" -- start
             pm2 save
             
             # Nginx 설정 확인 및 재로드 (필요시)
