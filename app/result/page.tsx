@@ -15,15 +15,19 @@ import {
   getGradeDescription,
 } from '@/lib/compatibility';
 import { formatYear, getZodiacEmoji, getZodiacInfo } from '@/lib/zodiac';
+import { getDetailedCompatibility } from '@/lib/zodiac-detailed-compatibility';
 import {
   AlertCircle,
   ArrowLeft,
+  BookOpen,
   CheckCircle,
   Heart,
+  Info,
   Lightbulb,
   Share2,
   Sparkles,
   Star,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -90,6 +94,7 @@ function ResultContent() {
   const parentInfo = getZodiacInfo(parentYearNum);
   const compatibility = calculateCompatibility(childInfo.animal, parentInfo.animal);
   const gradeColors = getCompatibilityColor(compatibility.grade);
+  const detailedCompatibility = getDetailedCompatibility(childInfo.animal, parentInfo.animal);
 
   const handleShare = () => {
     setShareModalOpen(true);
@@ -309,6 +314,87 @@ function ResultContent() {
               ))}
             </ul>
           </Card>
+
+          {/* 상세 궁합 분석 섹션 */}
+          {detailedCompatibility && (
+            <Card className="border-indigo-200 bg-gradient-to-r from-indigo-50 to-blue-50 p-6">
+              <div className="mb-6 flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-indigo-600" />
+                <Typography variant="h3" className="text-lg font-semibold text-indigo-800">
+                  전통 궁합 상세 분석
+                </Typography>
+                <Badge variant="secondary" className="bg-indigo-100 text-xs text-indigo-700">
+                  12지신 전통 해석
+                </Badge>
+              </div>
+
+              {/* 궁합 요약 */}
+              <div className="mb-6 rounded-lg bg-white/60 p-4 backdrop-blur-sm">
+                <div className="mb-3 flex items-center gap-2">
+                  <Users className="h-4 w-4 text-indigo-600" />
+                  <Typography variant="h4" className="font-medium text-indigo-800">
+                    궁합 개관
+                  </Typography>
+                </div>
+                <Typography className="leading-relaxed text-gray-700">
+                  {detailedCompatibility.summary}
+                </Typography>
+              </div>
+
+              {/* 상세 분석 그리드 */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {/* 긍정적 측면 */}
+                <div className="rounded-lg bg-green-50/80 p-4 backdrop-blur-sm">
+                  <div className="mb-3 flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <Typography variant="h5" className="text-sm font-semibold text-green-800">
+                      긍정적 측면
+                    </Typography>
+                  </div>
+                  <Typography variant="small" className="leading-relaxed text-green-700">
+                    {detailedCompatibility.positiveAspects}
+                  </Typography>
+                </div>
+
+                {/* 주의사항 */}
+                <div className="rounded-lg bg-amber-50/80 p-4 backdrop-blur-sm">
+                  <div className="mb-3 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-amber-600" />
+                    <Typography variant="h5" className="text-sm font-semibold text-amber-800">
+                      주의사항
+                    </Typography>
+                  </div>
+                  <Typography variant="small" className="leading-relaxed text-amber-700">
+                    {detailedCompatibility.concerns}
+                  </Typography>
+                </div>
+
+                {/* 관계 개선 조언 */}
+                <div className="rounded-lg bg-purple-50/80 p-4 backdrop-blur-sm sm:col-span-2 lg:col-span-1">
+                  <div className="mb-3 flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-purple-600" />
+                    <Typography variant="h5" className="text-sm font-semibold text-purple-800">
+                      개선 조언
+                    </Typography>
+                  </div>
+                  <Typography variant="small" className="leading-relaxed text-purple-700">
+                    {detailedCompatibility.advice}
+                  </Typography>
+                </div>
+              </div>
+
+              {/* 전통 해석 안내 */}
+              <div className="mt-6 flex items-start gap-3 rounded-lg bg-white/40 p-4 backdrop-blur-sm">
+                <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-indigo-500" />
+                <div>
+                  <Typography variant="small" className="text-indigo-700">
+                    <span className="font-medium">전통 12지신 해석:</span> 이 분석은 수천 년간 전해 내려온 동양의 전통 12지신 궁합 이론에 바탕을 둔 것으로, 
+                    각 띠의 고유한 특성과 상호작용을 통해 관계의 특징을 이해하는 데 도움을 드립니다.
+                  </Typography>
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* 추가 정보 섹션 */}
           <Card className="border-blue-200 bg-blue-50 p-6">
