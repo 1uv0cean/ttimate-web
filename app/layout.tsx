@@ -1,3 +1,4 @@
+import { ClientAdSense } from '@/components/ClientAdSense';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -100,13 +101,6 @@ const RootLayout = ({
       <head>
         {/* Google AdSense 소유권 확인 */}
         <meta name="google-adsense-account" content="ca-pub-1427543231397985" />
-        
-        {/* Google AdSense */}
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1427543231397985"
-          crossOrigin="anonymous"
-        />
 
         {/* 카카오톡 SDK */}
         <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" async />
@@ -115,36 +109,36 @@ const RootLayout = ({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebApplication',
-              name: '띠메이트',
-              description: '자녀와 부모의 띠 궁합을 분석하는 무료 서비스',
-              url: 'https://ttimate.com',
-              applicationCategory: 'EntertainmentApplication',
-              operatingSystem: 'Web Browser',
-              datePublished: '2025-07-28',
-              dateModified: '2025-07-28',
-              offers: {
-                '@type': 'Offer',
-                price: '0',
-                priceCurrency: 'KRW',
+            __html: `{
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "띠메이트",
+              "description": "자녀와 부모의 띠 궁합을 분석하는 무료 서비스",
+              "url": "https://ttimate.com",
+              "applicationCategory": "EntertainmentApplication",
+              "operatingSystem": "Web Browser",
+              "datePublished": "2025-07-28",
+              "dateModified": "2025-07-28",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "KRW"
               },
-              author: {
-                '@type': 'Organization',
-                name: '띠메이트',
+              "author": {
+                "@type": "Organization",
+                "name": "띠메이트"
               },
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.8',
-                reviewCount: '1250',
-              },
-            }),
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "reviewCount": "1250"
+              }
+            }`,
           }}
         />
 
         {/* 추가적인 메타 태그 */}
-        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="띠메이트" />
 
@@ -158,6 +152,7 @@ const RootLayout = ({
         <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ClientAdSense />
         {children}
 
         {/* Google Analytics */}
