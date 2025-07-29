@@ -82,6 +82,14 @@ jobs:
       - name: 빌드 파일 패키징
         run: |
           # 필요한 파일만 패키징하여 업로드 속도 향상
+          echo "📦 패키징할 파일 확인..."
+          ls -la package.json pnpm-lock.yaml next.config.ts
+          ls -la .next/ public/
+          
+          echo "📄 package.json 내용 검증:"
+          echo "파일 크기: $(wc -c < package.json) bytes"
+          head -3 package.json
+          
           tar -czf ttimate-build.tar.gz \
             --exclude='.next/cache' \
             --exclude='node_modules' \
@@ -90,6 +98,11 @@ jobs:
             package.json \
             pnpm-lock.yaml \
             next.config.ts
+          
+          echo "✅ 패키징 완료 - 파일 크기: $(du -h ttimate-build.tar.gz | cut -f1)"
+          
+          echo "📦 압축 파일 내용 검증:"
+          tar -tzf ttimate-build.tar.gz | grep -E "(package\.json|pnpm-lock\.yaml)" || echo "⚠️ 필수 파일이 압축에 포함되지 않았습니다!"
 
       - name: SSH 키 설정
         run: |
@@ -168,22 +181,89 @@ jobs:
             mkdir new_version
             
             # 빌드 파일 압축 해제
+            echo "📦 압축 파일 내용 확인:"
+            tar -tzf ttimate-build.tar.gz | head -10
+            
+            echo "📂 압축 해제 중..."
             tar -xzf ttimate-build.tar.gz -C new_version/
+            
+            echo "📋 압축 해제 후 파일 확인:"
+            ls -la new_version/
+            
+            echo "📄 package.json 내용 확인:"
+            if [ -f "new_version/package.json" ]; then
+              echo "package.json 파일 크기: $(wc -c < new_version/package.json) bytes"
+              head -5 new_version/package.json
+            else
+              echo "❌ package.json 파일이 없습니다!"
+              exit 1
+            fi
+            
             rm ttimate-build.tar.gz
             
             # Node.js 환경 설정
+            echo "🔧 Node.js 환경 설정 중..."
             export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm use 20 || nvm install 20
             
-            # pnpm 설정
-            corepack enable
-            corepack prepare pnpm@9 --activate
+            # NVM 로드
+            if [ -s "$NVM_DIR/nvm.sh" ]; then
+              \. "$NVM_DIR/nvm.sh"
+              echo "✅ NVM 로드 완료"
+            else
+              echo "⚠️ NVM이 설치되지 않았습니다. 시스템 Node.js 사용"
+            fi
+            
+            # Node.js 버전 확인/설치
+            if command -v nvm > /dev/null 2>&1; then
+              nvm use 20 2>/dev/null || nvm install 20
+            fi
+            
+            # Node.js 확인
+            node --version || echo "❌ Node.js를 찾을 수 없습니다"
+            
+            # pnpm 설정 (권한 오류 방지)
+            echo "🔧 pnpm 환경 설정 중..."
+            if command -v corepack > /dev/null 2>&1; then
+              corepack enable 2>/dev/null || echo "⚠️ corepack enable 실패 (권한 문제)"
+              corepack prepare pnpm@9 --activate 2>/dev/null || echo "⚠️ corepack prepare 실패"
+            fi
+            
+            # pnpm 경로 설정
             export PNPM_HOME="$HOME/.local/share/pnpm"
             export PATH="$PNPM_HOME:$PATH"
             
+            # pnpm 버전 확인
+            pnpm --version || echo "❌ pnpm을 찾을 수 없습니다"
+            
             # 새 버전에 의존성 설치 (운영용만)
             cd new_version
+            
+            # package.json 존재 및 내용 확인
+            if [ ! -f "package.json" ]; then
+              echo "❌ package.json 파일이 없습니다!"
+              ls -la
+              exit 1
+            fi
+            
+            # package.json 파일이 비어있는지 확인
+            if [ ! -s "package.json" ]; then
+              echo "❌ package.json 파일이 비어있습니다!"
+              echo "파일 크기: $(wc -c < package.json) bytes"
+              ls -la package.json
+              exit 1
+            fi
+            
+            # JSON 유효성 검사
+            if ! node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" 2>/dev/null; then
+              echo "❌ package.json이 유효한 JSON 형식이 아닙니다!"
+              echo "파일 내용:"
+              cat package.json | head -10
+              exit 1
+            fi
+            
+            echo "✅ package.json 검증 완료"
+            echo "파일 크기: $(wc -c < package.json) bytes"
+            
             pnpm install --prod --frozen-lockfile
             
             # 환경 변수 파일 생성
