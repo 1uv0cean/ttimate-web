@@ -1,5 +1,6 @@
 'use client';
 
+import { LoadingAd } from '@/components/ui/AdSenseAd';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -76,11 +77,11 @@ function ResultContent() {
           <Typography variant="h2" className="mb-4 text-gray-700">
             궁합을 분석하고 있습니다...
           </Typography>
-          <div className="mx-auto max-w-md rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 p-8">
-            <Typography variant="muted" className="text-gray-500">
+          <div className="mx-auto max-w-md">
+            <Typography variant="muted" className="mb-4 text-gray-500">
               분석 데이터를 준비하고 있습니다...
             </Typography>
-            {/* 여기에 Google AdSense 광고 코드가 삽입됩니다 */}
+            <LoadingAd />
           </div>
           <Typography variant="small" className="mt-4 text-gray-400">
             잠시만 기다려주세요...
