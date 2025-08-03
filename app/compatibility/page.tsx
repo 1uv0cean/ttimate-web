@@ -229,7 +229,7 @@ const CompatibilityPage = () => {
           {/* CTA 섹션 */}
           <div className="text-center">
             <Typography variant="h3" className="mb-4 text-lg font-semibold text-gray-800">
-              우리 가족의 띠 궁합을 확인해보세요
+              띠 궁합을 확인해보세요
             </Typography>
             <Button size="lg" asChild className="px-8">
               <Link href="/">궁합 확인하기</Link>

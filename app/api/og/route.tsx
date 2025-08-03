@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { ImageResponse } from 'next/og';
 import { getZodiacInfo, getZodiacEmoji } from '@/lib/zodiac';
-import { calculateCompatibility } from '@/lib/compatibility';
+import { calculateCompatibility, getRelationshipLabels, type RelationshipType } from '@/lib/compatibility';
 
 export const runtime = 'edge';
 
@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const childYear = searchParams.get('child');
   const parentYear = searchParams.get('parent');
+  const relationshipType = (searchParams.get('relationship') as RelationshipType) || 'family';
 
   if (!childYear || !parentYear) {
     return new ImageResponse(
@@ -32,7 +33,12 @@ export async function GET(request: NextRequest) {
             <div style={{ color: '#ec4899', display: 'flex' }}>띠메이트</div>
           </div>
           <div style={{ color: '#6b7280', fontSize: 24, display: 'flex' }}>
-            자녀와 부모의 띠 궁합을 알아보세요
+            {relationshipType === 'lover' 
+              ? '연인의 띠 궁합을 알아보세요'
+              : relationshipType === 'family'
+              ? '가족의 띠 궁합을 알아보세요'
+              : '친구의 띠 궁합을 알아보세요'
+            }
           </div>
         </div>
       ),
@@ -49,7 +55,8 @@ export async function GET(request: NextRequest) {
     
     const childInfo = getZodiacInfo(childYearNum);
     const parentInfo = getZodiacInfo(parentYearNum);
-    const compatibility = calculateCompatibility(childInfo.animal, parentInfo.animal);
+    const compatibility = calculateCompatibility(childInfo.animal, parentInfo.animal, relationshipType);
+    const relationshipLabels = getRelationshipLabels(relationshipType);
 
     // 궁합 등급에 따른 색상
     const gradeColors = {
@@ -107,7 +114,7 @@ export async function GET(request: NextRequest) {
                 {getZodiacEmoji(childInfo.animal).split(' ')[0]}
               </div>
               <div style={{ fontSize: 24, fontWeight: 600, color: '#1e40af', display: 'flex' }}>
-                {childInfo.animal}띠 자녀
+                {childInfo.animal}띠 {relationshipLabels.first}
               </div>
               <div style={{ fontSize: 18, color: '#6b7280', display: 'flex' }}>
                 {childYear}년생
@@ -137,7 +144,7 @@ export async function GET(request: NextRequest) {
                 {getZodiacEmoji(parentInfo.animal).split(' ')[0]}
               </div>
               <div style={{ fontSize: 24, fontWeight: 600, color: '#7c3aed', display: 'flex' }}>
-                {parentInfo.animal}띠 부모
+                {parentInfo.animal}띠 {relationshipLabels.second}
               </div>
               <div style={{ fontSize: 18, color: '#6b7280', display: 'flex' }}>
                 {parentYear}년생

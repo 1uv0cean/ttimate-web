@@ -6,9 +6,10 @@ import { Card } from '@/components/ui/Card';
 import { Footer } from '@/components/ui/Footer';
 import { Input } from '@/components/ui/Input';
 import { Section } from '@/components/ui/Section';
+import { Select } from '@/components/ui/Select';
 import { Typography } from '@/components/ui/Typography';
 import { validateYear } from '@/lib/zodiac';
-import { Heart, Sparkles, Star } from 'lucide-react';
+import { Heart, Sparkles, Star, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -17,8 +18,15 @@ const HomePage = () => {
   const router = useRouter();
   const [childYear, setChildYear] = useState('');
   const [parentYear, setParentYear] = useState('');
+  const [relationshipType, setRelationshipType] = useState('family');
   const [errors, setErrors] = useState<{ child?: string; parent?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const relationshipOptions = [
+    { value: 'lover', label: '🥰 연인' },
+    { value: 'family', label: '👨‍👩‍👧‍👦 가족' },
+    { value: 'friend', label: '👥 지인' },
+  ];
 
   // 페이지 포커스 시 로딩 상태 초기화
   useEffect(() => {
@@ -68,6 +76,7 @@ const HomePage = () => {
     const params = new URLSearchParams({
       child: childYear,
       parent: parentYear,
+      relationship: relationshipType,
     });
 
     router.push(`/result?${params.toString()}`);
@@ -106,15 +115,15 @@ const HomePage = () => {
               </div>
             </div>
             <Typography variant="h1" className="mb-3 text-2xl text-gray-800 sm:text-3xl">
-              자녀와 부모의 띠 궁합
+              띠로 알아보는 특별한 궁합
             </Typography>
             <Typography variant="muted" className="text-sm text-gray-600 sm:text-base">
               생년을 입력하여 띠를 확인하고
               <br />
-              부모와 자녀의 특별한 궁합을 알아보세요
+              연인, 가족, 지인과의 궁합을 알아보세요
             </Typography>
             <Typography variant="small" className="mt-2 text-gray-500">
-              가족 간의 이해와 소통을 돕는 전통 띠 궁합 서비스
+              관계를 이해하고 소통을 돕는 전통 띠 궁합 서비스
             </Typography>
           </div>
 
@@ -126,14 +135,23 @@ const HomePage = () => {
                   variant="h3"
                   className="mb-6 text-center text-lg font-semibold text-gray-700"
                 >
-                  생년 입력
+                  궁합 정보 입력
                 </Typography>
 
                 <div className="space-y-4">
+                  <Select
+                    label="관계 유형"
+                    options={relationshipOptions}
+                    value={relationshipType}
+                    onValueChange={setRelationshipType}
+                    leftIcon={<Users className="h-4 w-4" />}
+                    size="lg"
+                  />
+
                   <Input
-                    label="자녀 생년"
+                    label={relationshipType === 'family' ? "자녀 생년" : relationshipType === 'lover' ? "나의 생년" : "본인 생년"}
                     type="number"
-                    placeholder="예: 2010"
+                    placeholder="예: 2000"
                     value={childYear}
                     onChange={(e) => setChildYear(e.target.value)}
                     error={errors.child}
@@ -145,9 +163,9 @@ const HomePage = () => {
                   />
 
                   <Input
-                    label="부모 생년"
+                    label={relationshipType === 'family' ? "부모 생년" : relationshipType === 'lover' ? "상대방 생년" : "상대방 생년"}
                     type="number"
-                    placeholder="예: 1985"
+                    placeholder="예: 1998"
                     value={parentYear}
                     onChange={(e) => setParentYear(e.target.value)}
                     error={errors.parent}
@@ -194,12 +212,20 @@ const HomePage = () => {
             </Typography>
             <div className="space-y-3 text-sm text-gray-600">
               <Typography>
-                띠메이트는 동양의 전통적인 12간지 띠를 기반으로 부모와 자녀 간의 성격적 조화를
-                분석하는 서비스입니다.
+                {relationshipType === 'lover' 
+                  ? '띠메이트는 동양의 전통적인 12간지 띠를 기반으로 연인 간의 성격적 조화와 애정 궁합을 분석하는 서비스입니다.'
+                  : relationshipType === 'family'
+                  ? '띠메이트는 동양의 전통적인 12간지 띠를 기반으로 가족 구성원 간의 성격적 조화를 분석하는 서비스입니다.'
+                  : '띠메이트는 동양의 전통적인 12간지 띠를 기반으로 친구나 지인 간의 성격적 조화와 우정을 분석하는 서비스입니다.'
+                }
               </Typography>
               <Typography>
-                각 띠가 가진 고유한 성격적 특성과 오행(五行) 이론을 바탕으로, 가족 구성원 간의
-                관계를 더 깊이 이해하고 서로를 존중하는 데 도움을 드립니다.
+                {relationshipType === 'lover'
+                  ? '각 띠가 가진 고유한 성격적 특성과 오행(五行) 이론을 바탕으로, 연인 관계를 더 깊이 이해하고 서로를 사랑하는 데 도움을 드립니다.'
+                  : relationshipType === 'family'
+                  ? '각 띠가 가진 고유한 성격적 특성과 오행(五行) 이론을 바탕으로, 가족 관계를 더 깊이 이해하고 서로를 존중하는 데 도움을 드립니다.'
+                  : '각 띠가 가진 고유한 성격적 특성과 오행(五行) 이론을 바탕으로, 친구 관계를 더 깊이 이해하고 서로를 존중하는 데 도움을 드립니다.'
+                }
               </Typography>
               <div className="mt-4 rounded-lg bg-white p-4">
                 <Typography variant="h4" className="mb-2 font-semibold text-gray-700">
@@ -229,7 +255,7 @@ const HomePage = () => {
                 </div>
                 <div>
                   <Typography className="text-sm text-gray-700">
-                    자녀와 부모의 태어난 연도를 입력해주세요. (양력 기준)
+                    관계 유형(연인, 가족, 지인)을 선택하고 두 사람의 태어난 연도를 입력해주세요. (양력 기준)
                   </Typography>
                 </div>
               </div>
@@ -249,7 +275,12 @@ const HomePage = () => {
                 </div>
                 <div>
                   <Typography className="text-sm text-gray-700">
-                    두 사람의 띠 궁합 결과와 함께 관계 개선을 위한 맞춤형 조언을 확인하세요.
+                    {relationshipType === 'lover'
+                      ? '연인 관계에 맞는 궁합 결과와 함께 더 달콤한 사랑을 위한 조언을 확인하세요.'
+                      : relationshipType === 'family'
+                      ? '가족 관계에 맞는 궁합 결과와 함께 더 화목한 가정을 위한 조언을 확인하세요.'
+                      : '친구 관계에 맞는 궁합 결과와 함께 더 깊은 우정을 위한 조언을 확인하세요.'
+                    }
                   </Typography>
                 </div>
               </div>

@@ -11,6 +11,9 @@ export type CompatibilityScore = number;
 // 궁합 등급
 export type CompatibilityGrade = '최고' | '좋음' | '보통' | '주의' | '불화';
 
+// 관계 유형 정의
+export type RelationshipType = 'lover' | 'family' | 'friend';
+
 // 궁합 결과 인터페이스
 export interface CompatibilityResult {
   childAnimal: ZodiacAnimal;
@@ -22,7 +25,7 @@ export interface CompatibilityResult {
   positiveAspects: string[];
   challenges: string[];
   advice: string[];
-  relationshipType: '부모-자녀' | '가족';
+  relationshipType: RelationshipType;
 }
 
 // 띠 궁합 매트릭스 (대흉=10, 흉=30, 길=70, 대길=90)
@@ -75,6 +78,25 @@ const COMPATIBILITY_MATRIX: Record<ZodiacAnimal, Record<ZodiacAnimal, number>> =
   '돼지': {
     '쥐': 50, '소': 50, '호랑이': 70, '토끼': 70, '용': 30, '뱀': 10, 
     '말': 50, '양': 70, '원숭이': 30, '닭': 50, '개': 50, '돼지': 30
+  }
+};
+
+// 관계 유형별 설명 데이터
+const RELATIONSHIP_DESCRIPTIONS: Record<RelationshipType, {
+  labels: { first: string; second: string };
+  context: string;
+}> = {
+  lover: {
+    labels: { first: '나', second: '연인' },
+    context: '연인 관계에서'
+  },
+  family: {
+    labels: { first: '자녀', second: '부모' },
+    context: '가족 관계에서'
+  },
+  friend: {
+    labels: { first: '본인', second: '상대방' },
+    context: '친구 관계에서'
   }
 };
 
@@ -279,7 +301,12 @@ function getGradeFromScore(score: CompatibilityScore): CompatibilityGrade {
 /**
  * 기본 궁합 설명 생성
  */
-function generateDefaultDescription(childAnimal: ZodiacAnimal, parentAnimal: ZodiacAnimal, score: number): {
+function generateDefaultDescription(
+  firstAnimal: ZodiacAnimal, 
+  secondAnimal: ZodiacAnimal, 
+  score: number, 
+  relationshipType: RelationshipType
+): {
   summary: string;
   description: string;
   positiveAspects: string[];
@@ -287,51 +314,166 @@ function generateDefaultDescription(childAnimal: ZodiacAnimal, parentAnimal: Zod
   advice: string[];
 } {
   const grade = getGradeFromScore(score);
+  const relationInfo = RELATIONSHIP_DESCRIPTIONS[relationshipType];
   
-  const summaryMap: Record<CompatibilityGrade, string> = {
-    '최고': '환상적인 궁합! 서로를 완벽하게 이해하고 지원하는 관계',
-    '좋음': '매우 좋은 궁합! 서로의 장점을 살리는 조화로운 관계',
-    '보통': '안정적인 관계! 서로 노력하면 더욱 발전할 수 있는 관계',
-    '주의': '주의가 필요한 관계! 상호 이해와 배려가 중요한 관계',
-    '불화': '특별한 관심이 필요한 관계! 진심어린 노력이 필요한 관계'
+  // 관계 유형별 요약 설명
+  const summaryMap: Record<RelationshipType, Record<CompatibilityGrade, string>> = {
+    lover: {
+      '최고': '운명적 사랑! 서로를 완벽하게 이해하고 사랑하는 최고의 연인',
+      '좋음': '달콤한 사랑! 서로의 매력에 빠져 행복한 연애를 하는 좋은 궁합',
+      '보통': '평범한 연애! 노력하면 더욱 깊은 사랑으로 발전할 수 있는 관계',
+      '주의': '신중한 연애! 서로를 이해하려는 노력이 필요한 관계',
+      '불화': '도전적 사랑! 많은 인내와 배려가 필요하지만 극복 가능한 관계'
+    },
+    family: {
+      '최고': '완벽한 가족! 서로를 완벽하게 이해하고 지원하는 이상적인 가족 관계',
+      '좋음': '화목한 가족! 서로의 장점을 살리며 따뜻한 가정을 만드는 좋은 궁합',
+      '보통': '안정적인 가족! 서로 노력하면 더욱 발전할 수 있는 가족 관계',
+      '주의': '주의 깊은 관계! 세대 차이 이해와 배려가 중요한 가족 관계',
+      '불화': '특별한 노력! 가족 간 갈등을 극복하려는 진심어린 노력이 필요'
+    },
+    friend: {
+      '최고': '평생 친구! 서로를 완벽하게 이해하고 신뢰하는 최고의 우정',
+      '좋음': '좋은 친구! 서로의 장점을 인정하며 즐거운 우정을 나누는 관계',
+      '보통': '무난한 친구! 서로 노력하면 더욱 깊은 우정으로 발전 가능한 관계',
+      '주의': '조심스러운 관계! 오해를 피하고 신중하게 우정을 쌓아가야 하는 관계',
+      '불화': '어려운 우정! 갈등을 극복하려는 특별한 노력과 이해가 필요'
+    }
+  };
+
+  // 관계 유형별 상세 설명
+  const descriptionMap: Record<RelationshipType, Record<CompatibilityGrade, string>> = {
+    lover: {
+      '최고': `${firstAnimal}띠와 ${secondAnimal}띠는 연인으로서 천생연분입니다. 서로의 감정을 잘 이해하고 사랑을 표현하는 방식이 잘 맞아 행복한 연애를 할 수 있습니다.`,
+      '좋음': `${firstAnimal}띠와 ${secondAnimal}띠는 연인으로서 서로를 보완하며 달콤한 사랑을 키워갈 수 있습니다. 서로의 매력을 인정하고 존중하는 관계입니다.`,
+      '보통': `${firstAnimal}띠와 ${secondAnimal}띠는 연인으로서 평범하지만 안정적인 관계를 유지할 수 있습니다. 노력하면 더 깊은 사랑으로 발전할 수 있습니다.`,
+      '주의': `${firstAnimal}띠와 ${secondAnimal}띠는 연인으로서 서로 다른 연애 스타일로 인해 갈등이 생길 수 있습니다. 상대방을 이해하려는 노력이 필요합니다.`,
+      '불화': `${firstAnimal}띠와 ${secondAnimal}띠는 연인으로서 성격과 가치관 차이로 많은 어려움을 겪을 수 있습니다. 진정한 사랑이 있다면 극복 가능합니다.`
+    },
+    family: {
+      '최고': `${firstAnimal}띠 ${relationInfo.labels.first}와 ${secondAnimal}띠 ${relationInfo.labels.second}는 가족으로서 서로를 완벽하게 이해하고 지지하는 이상적인 관계입니다.`,
+      '좋음': `${firstAnimal}띠 ${relationInfo.labels.first}와 ${secondAnimal}띠 ${relationInfo.labels.second}는 가족으로서 서로의 장점을 살리며 화목한 가정을 만들어갑니다.`,
+      '보통': `${firstAnimal}띠 ${relationInfo.labels.first}와 ${secondAnimal}띠 ${relationInfo.labels.second}는 가족으로서 평범하지만 안정적인 관계를 유지할 수 있습니다.`,
+      '주의': `${firstAnimal}띠 ${relationInfo.labels.first}와 ${secondAnimal}띠 ${relationInfo.labels.second}는 가족으로서 세대 차이나 가치관 차이로 갈등이 있을 수 있습니다.`,
+      '불화': `${firstAnimal}띠 ${relationInfo.labels.first}와 ${secondAnimal}띠 ${relationInfo.labels.second}는 가족으로서 많은 갈등을 겪을 수 있지만, 가족애로 극복할 수 있습니다.`
+    },
+    friend: {
+      '최고': `${firstAnimal}띠와 ${secondAnimal}띠는 친구로서 서로를 완벽하게 이해하고 신뢰하는 평생 친구가 될 수 있습니다.`,
+      '좋음': `${firstAnimal}띠와 ${secondAnimal}띠는 친구로서 서로의 장점을 인정하며 즐거운 우정을 나눌 수 있는 좋은 관계입니다.`,
+      '보통': `${firstAnimal}띠와 ${secondAnimal}띠는 친구로서 평범하지만 꾸준한 우정을 유지할 수 있는 안정적인 관계입니다.`,
+      '주의': `${firstAnimal}띠와 ${secondAnimal}띠는 친구로서 서로 다른 성향으로 인해 오해가 생길 수 있어 조심스러운 관계입니다.`,
+      '불화': `${firstAnimal}띠와 ${secondAnimal}띠는 친구로서 성격 차이로 갈등이 많을 수 있지만, 서로를 이해하면 좋은 친구가 될 수 있습니다.`
+    }
+  };
+
+  // 관계 유형별 장점
+  const positiveAspectsMap: Record<RelationshipType, Record<CompatibilityGrade, string[]>> = {
+    lover: {
+      '최고': ['완벽한 감정적 교감', '자연스러운 스킨십', '공통된 미래 목표', '서로에 대한 깊은 이해'],
+      '좋음': ['달콤한 로맨스', '서로를 보완하는 매력', '즐거운 데이트', '안정적인 애정 표현'],
+      '보통': ['편안한 관계', '서로에 대한 기본적 신뢰', '성장할 수 있는 여지', '무난한 소통'],
+      '주의': ['서로 다른 매력 발견', '관계 개선의 기회', '인내심 발달', '더 깊은 이해 가능'],
+      '불화': ['극복을 통한 성장', '진정한 사랑 확인', '강한 의지력', '서로에 대한 새로운 발견']
+    },
+    family: {
+      '최고': ['완벽한 가족 조화', '서로에 대한 무조건적 사랑', '가족 전통 계승', '안정적인 가정 환경'],
+      '좋음': ['따뜻한 가족애', '서로를 지지하는 관계', '건전한 가정 문화', '상호 존중'],
+      '보통': ['평화로운 가정', '기본적인 가족 유대', '안정적인 생활', '무난한 소통'],
+      '주의': ['세대 차이 극복 기회', '서로 배울 점', '가족 관계 개선', '인내심 발달'],
+      '불화': ['가족애를 통한 극복', '더 깊은 이해', '관계 개선 의지', '가족 결속력 강화']
+    },
+    friend: {
+      '최고': ['완벽한 우정', '서로에 대한 절대적 신뢰', '평생 동반자', '무조건적 지지'],
+      '좋음': ['즐거운 우정', '서로를 이해하는 관계', '좋은 추억 공유', '상호 격려'],
+      '보통': ['안정적인 우정', '기본적인 신뢰', '꾸준한 관계', '무난한 교류'],
+      '주의': ['서로 다른 관점 학습', '우정 발전 가능성', '관계 개선 기회', '인내심 기르기'],
+      '불화': ['극복을 통한 성장', '진정한 우정 확인', '서로에 대한 새로운 이해', '관계 발전 의지']
+    }
+  };
+
+  // 관계 유형별 도전 과제
+  const challengesMap: Record<RelationshipType, Record<CompatibilityGrade, string[]>> = {
+    lover: {
+      '최고': ['완벽함에 대한 부담', '질투나 독점욕', '미래에 대한 과도한 기대'],
+      '좋음': ['연애 초기의 설렘 유지', '서로 다른 연애 스타일', '미래 계획의 차이'],
+      '보통': ['연애의 매너리즘', '감정 표현의 어려움', '서로에 대한 무관심'],
+      '주의': ['잦은 의견 충돌', '연애 가치관 차이', '감정적 거리감'],
+      '불화': ['극심한 성격 차이', '자주 발생하는 갈등', '이별 위기']
+    },
+    family: {
+      '최고': ['과도한 기대', '완벽주의 성향', '외부 시선에 대한 부담'],
+      '좋음': ['서로 다른 생활 패턴', '세대 간 취향 차이', '역할 분담 문제'],
+      '보통': ['일상의 권태감', '소통 부족', '서로에 대한 무관심'],
+      '주의': ['세대 차이로 인한 갈등', '가치관 충돌', '의사소통 장벽'],
+      '불화': ['극심한 가치관 차이', '자주 발생하는 가족 갈등', '감정적 상처']
+    },
+    friend: {
+      '최고': ['과도한 의존', '질투나 경쟁심', '완벽한 관계에 대한 부담'],
+      '좋음': ['서로 다른 관심사', '시간 투자의 차이', '친구 간 경계'],
+      '보통': ['만남의 빈도 조절', '관심의 감소', '새로운 친구들과의 균형'],
+      '주의': ['자주 발생하는 오해', '성향 차이로 인한 갈등', '신뢰 부족'],
+      '불화': ['극심한 성격 차이', '자주 발생하는 다툼', '우정의 지속 어려움']
+    }
+  };
+
+  // 관계 유형별 조언
+  const adviceMap: Record<RelationshipType, Record<CompatibilityGrade, string[]>> = {
+    lover: {
+      '최고': ['서로의 사랑을 자주 표현하세요', '공통의 꿈을 함께 키워나가세요', '현재의 행복을 소중히 여기세요'],
+      '좋음': ['데이트 시간을 자주 가지세요', '서로의 취미를 존중해주세요', '미래 계획을 함께 세우세요'],
+      '보통': ['충분한 대화시간을 가지세요', '서로의 차이를 인정하고 존중해주세요', '작은 것에도 감사를 표현하세요'],
+      '주의': ['인내심을 가지고 소통하세요', '서로의 감정을 이해하려 노력하세요', '전문가의 도움을 받는 것도 좋습니다'],
+      '불화': ['감정적 대립을 피하세요', '중재자의 도움을 받아보세요', '서로에게 시간과 공간을 주세요']
+    },
+    family: {
+      '최고': ['가족 시간을 소중히 하세요', '서로의 장점을 격려해주세요', '전통을 함께 이어가세요'],
+      '좋음': ['규칙적인 대화를 나누세요', '서로의 역할을 존중해주세요', '가족의 화합을 위해 노력하세요'],
+      '보통': ['충분한 대화시간을 가지세요', '서로의 차이를 인정하고 존중해주세요', '작은 것에도 감사를 표현하세요'],
+      '주의': ['세대 차이를 이해하려 노력하세요', '서로의 입장을 헤아려보세요', '가족 상담을 받아보세요'],
+      '불화': ['감정적 갈등을 피하세요', '중립적인 대화를 시도하세요', '전문가의 도움을 받으세요']
+    },
+    friend: {
+      '최고': ['우정을 소중히 여기세요', '서로의 성공을 축하해주세요', '평생 친구로 지내세요'],
+      '좋음': ['정기적으로 만나는 시간을 가지세요', '서로의 관심사를 공유하세요', '어려울 때 도움을 주고받으세요'],
+      '보통': ['충분한 대화시간을 가지세요', '서로의 차이를 인정하고 존중해주세요', '작은 것에도 감사를 표현하세요'],
+      '주의': ['오해가 생기지 않도록 주의하세요', '서로의 경계를 존중하세요', '솔직한 대화를 나누세요'],
+      '불화': ['불필요한 경쟁을 피하세요', '거리를 두는 것도 좋습니다', '공통 관심사를 찾아보세요']
+    }
   };
 
   return {
-    summary: summaryMap[grade],
-    description: `${childAnimal}띠 자녀와 ${parentAnimal}띠 부모는 ${summaryMap[grade].split('!')[1].trim()}입니다. 서로의 특성을 이해하고 존중하며 좋은 관계를 만들어가세요.`,
-    positiveAspects: ['서로 다른 관점', '상호 학습', '성장 기회', '가족 유대감'],
-    challenges: ['성향 차이', '세대 차이', '소통 방식 차이'],
-    advice: ['충분한 대화시간을 가지세요', '서로의 차이를 인정하고 존중해주세요', '작은 것에도 감사를 표현하세요']
+    summary: summaryMap[relationshipType][grade],
+    description: descriptionMap[relationshipType][grade],
+    positiveAspects: positiveAspectsMap[relationshipType][grade],
+    challenges: challengesMap[relationshipType][grade],
+    advice: adviceMap[relationshipType][grade]
   };
 }
 
 /**
  * 띠 궁합을 계산합니다
- * @param childAnimal 자녀의 띠
- * @param parentAnimal 부모의 띠
+ * @param firstAnimal 첫 번째 사람의 띠
+ * @param secondAnimal 두 번째 사람의 띠
+ * @param relationshipType 관계 유형
  * @returns 궁합 결과
  */
-export function calculateCompatibility(childAnimal: ZodiacAnimal, parentAnimal: ZodiacAnimal): CompatibilityResult {
-  const score = COMPATIBILITY_MATRIX[childAnimal][parentAnimal];
+export function calculateCompatibility(
+  firstAnimal: ZodiacAnimal, 
+  secondAnimal: ZodiacAnimal, 
+  relationshipType: RelationshipType = 'family'
+): CompatibilityResult {
+  const score = COMPATIBILITY_MATRIX[firstAnimal][secondAnimal];
   const grade = getGradeFromScore(score);
   
-  // 특정 궁합에 대한 상세 설명이 있는지 확인
-  const key1 = `${childAnimal}-${parentAnimal}`;
-  const key2 = `${parentAnimal}-${childAnimal}`;
-  
-  let compatibility = COMPATIBILITY_DESCRIPTIONS[key1] || COMPATIBILITY_DESCRIPTIONS[key2];
-  
-  // 특정 설명이 없으면 기본 설명 생성
-  if (!compatibility) {
-    compatibility = generateDefaultDescription(childAnimal, parentAnimal, score);
-  }
+  // 관계 유형에 따른 맞춤 설명 생성 (기존 고정 설명은 사용하지 않음)
+  const compatibility = generateDefaultDescription(firstAnimal, secondAnimal, score, relationshipType);
 
   return {
-    childAnimal,
-    parentAnimal,
+    childAnimal: firstAnimal,
+    parentAnimal: secondAnimal,
     score,
     grade,
-    relationshipType: '부모-자녀',
+    relationshipType,
     ...compatibility
   };
 }
@@ -341,21 +483,23 @@ export function calculateCompatibility(childAnimal: ZodiacAnimal, parentAnimal: 
  * @param childAnimal 자녀의 띠
  * @param fatherAnimal 아버지의 띠
  * @param motherAnimal 어머니의 띠 (선택사항)
+ * @param relationshipType 관계 유형
  * @returns 궁합 결과 배열
  */
 export function calculateFamilyCompatibility(
   childAnimal: ZodiacAnimal,
   fatherAnimal: ZodiacAnimal,
-  motherAnimal?: ZodiacAnimal
+  motherAnimal?: ZodiacAnimal,
+  relationshipType: RelationshipType = 'family'
 ): CompatibilityResult[] {
   const results: CompatibilityResult[] = [];
   
   // 아버지와의 궁합
-  results.push(calculateCompatibility(childAnimal, fatherAnimal));
+  results.push(calculateCompatibility(childAnimal, fatherAnimal, relationshipType));
   
   // 어머니와의 궁합 (있는 경우)
   if (motherAnimal && motherAnimal !== fatherAnimal) {
-    results.push(calculateCompatibility(childAnimal, motherAnimal));
+    results.push(calculateCompatibility(childAnimal, motherAnimal, relationshipType));
   }
   
   return results;
@@ -406,4 +550,18 @@ export function getGradeDescription(grade: CompatibilityGrade): string {
   };
   
   return descriptions[grade];
+}
+
+/**
+ * 관계 유형에 따른 라벨을 반환
+ * @param relationshipType 관계 유형
+ * @returns 관계 라벨
+ */
+export function getRelationshipLabels(relationshipType: RelationshipType): { first: string; second: string; context: string } {
+  const relationInfo = RELATIONSHIP_DESCRIPTIONS[relationshipType];
+  return {
+    first: relationInfo.labels.first,
+    second: relationInfo.labels.second,
+    context: relationInfo.context
+  };
 }
