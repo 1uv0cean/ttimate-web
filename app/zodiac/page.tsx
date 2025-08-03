@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Footer } from '@/components/ui/Footer';
 import { Typography } from '@/components/ui/Typography';
-import { getZodiacInfo, getZodiacEmoji } from '@/lib/zodiac';
+import { getZodiacEmoji, getZodiacInfo, type ZodiacAnimal } from '@/lib/zodiac';
 import { Heart, Sparkles, Star } from 'lucide-react';
 import Link from 'next/link';
 
 const ZodiacPage = () => {
-  const zodiacAnimals = [
+  const zodiacAnimals: Array<{ name: ZodiacAnimal; years: number[] }> = [
     { name: '쥐', years: [1960, 1972, 1984, 1996, 2008, 2020, 2032] },
     { name: '소', years: [1961, 1973, 1985, 1997, 2009, 2021, 2033] },
     { name: '호랑이', years: [1962, 1974, 1986, 1998, 2010, 2022, 2034] },
@@ -65,49 +65,68 @@ const ZodiacPage = () => {
             {zodiacAnimals.map((zodiac, index) => {
               const info = getZodiacInfo(zodiac.years[0]);
               const emoji = getZodiacEmoji(zodiac.name);
-              
+
               return (
-                <Card key={index} className="border-0 bg-white/90 p-6 shadow-lg backdrop-blur-sm hover:shadow-xl transition-shadow">
-                  <div className="text-center mb-4">
-                    <div className="text-4xl mb-2">{emoji.split(' ')[0]}</div>
-                    <Typography variant="h3" className="text-xl font-bold text-gray-800 mb-1">
+                <Card
+                  key={index}
+                  className="border-0 bg-white/90 p-6 shadow-lg backdrop-blur-sm transition-shadow hover:shadow-xl"
+                >
+                  <div className="mb-4 text-center">
+                    <div className="mb-2 text-4xl">{emoji.split(' ')[0]}</div>
+                    <Typography variant="h3" className="mb-1 text-xl font-bold text-gray-800">
                       {zodiac.name}띠
                     </Typography>
                     <Typography variant="small" className="text-gray-500">
-                      {info.character}
+                      {info.element}
                     </Typography>
                   </div>
 
                   <div className="space-y-3">
                     <div>
-                      <Typography variant="h4" className="text-sm font-semibold text-gray-700 mb-1">
-                        성격 특징
+                      <Typography variant="h4" className="mb-1 text-sm font-semibold text-gray-700">
+                        성격
                       </Typography>
-                      <Typography className="text-sm text-gray-600">
-                        {info.traits}
-                      </Typography>
+                      <div>
+                        <Typography className="text-sm text-gray-600">
+                          {info.personality}
+                        </Typography>
+                      </div>
                     </div>
 
                     <div>
-                      <Typography variant="h4" className="text-sm font-semibold text-gray-700 mb-1">
-                        장점
+                      <Typography variant="h4" className="mb-1 text-sm font-semibold text-gray-700">
+                        특징
                       </Typography>
-                      <Typography className="text-sm text-gray-600">
-                        {info.strengths}
-                      </Typography>
+                      <div className="flex flex-wrap gap-1">
+                        {info.characteristics.map((char, charIndex) => (
+                          <span
+                            key={charIndex}
+                            className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
+                          >
+                            {char}
+                          </span>
+                        ))}
+                      </div>
                     </div>
 
                     <div>
-                      <Typography variant="h4" className="text-sm font-semibold text-gray-700 mb-1">
-                        주의할 점
+                      <Typography variant="h4" className="mb-1 text-sm font-semibold text-gray-700">
+                        행운의 색상
                       </Typography>
-                      <Typography className="text-sm text-gray-600">
-                        {info.weaknesses}
-                      </Typography>
+                      <div className="flex flex-wrap gap-1">
+                        {info.luckyColors.map((color, colorIndex) => (
+                          <span
+                            key={colorIndex}
+                            className="rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-700"
+                          >
+                            {color}
+                          </span>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="border-t pt-3">
-                      <Typography variant="h4" className="text-sm font-semibold text-gray-700 mb-2">
+                      <Typography variant="h4" className="mb-2 text-sm font-semibold text-gray-700">
                         해당 연도
                       </Typography>
                       <div className="flex flex-wrap gap-1">
@@ -131,27 +150,31 @@ const ZodiacPage = () => {
           </div>
 
           {/* 광고 배치 - 콘텐츠 중간 */}
-          <div className="mt-8 mx-auto max-w-md">
+          <div className="mx-auto mt-8 max-w-md">
             <AdBanner size="medium" placeholder={false} />
           </div>
 
           {/* 추가 정보 섹션 */}
           <Card className="mt-8 border-purple-200 bg-purple-50 p-6">
-            <Typography variant="h3" className="mb-4 text-center text-lg font-semibold text-purple-800">
+            <Typography
+              variant="h3"
+              className="mb-4 text-center text-lg font-semibold text-purple-800"
+            >
               12간지의 역사와 의미
             </Typography>
             <div className="space-y-4 text-gray-700">
               <Typography>
-                12간지(十二干支)는 중국에서 시작되어 동아시아 전체에 퍼진 전통적인 시간 체계입니다. 
-                각각의 동물이 가진 특성과 성격이 그 해에 태어난 사람들의 기질에 영향을 준다고 여겨져 왔습니다.
+                12간지(十二干支)는 중국에서 시작되어 동아시아 전체에 퍼진 전통적인 시간 체계입니다.
+                각각의 동물이 가진 특성과 성격이 그 해에 태어난 사람들의 기질에 영향을 준다고 여겨져
+                왔습니다.
               </Typography>
               <Typography>
-                12간지는 단순한 점술이 아니라, 수천 년간 축적된 동양의 철학과 지혜가 담긴 문화 유산입니다. 
-                각 띠의 특성을 이해하면 자신과 타인을 더 깊이 이해하는 데 도움이 됩니다.
+                12간지는 단순한 점술이 아니라, 수천 년간 축적된 동양의 철학과 지혜가 담긴 문화
+                유산입니다. 각 띠의 특성을 이해하면 자신과 타인을 더 깊이 이해하는 데 도움이 됩니다.
               </Typography>
               <Typography>
-                띠메이트에서는 이러한 전통적인 지혜를 현대적으로 해석하여, 
-                가족 간의 이해와 소통을 돕는 실용적인 가이드를 제공합니다.
+                띠메이트에서는 이러한 전통적인 지혜를 현대적으로 해석하여, 가족 간의 이해와 소통을
+                돕는 실용적인 가이드를 제공합니다.
               </Typography>
             </div>
           </Card>
