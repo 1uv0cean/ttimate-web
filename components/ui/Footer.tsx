@@ -19,13 +19,25 @@ export const Footer = ({ className = '' }: FooterProps) => {
     <footer className={`mt-16 border-t border-pink-100 bg-white/50 py-8 ${className}`}>
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="flex flex-wrap justify-center gap-4 text-sm">
+          <div className="flex flex-wrap justify-center gap-2 text-sm sm:gap-4">
             <Link href="/" className="text-gray-600 hover:text-pink-600 transition-colors">
               홈
             </Link>
             <span className="text-gray-300">|</span>
             <Link href="/about" className="text-gray-600 hover:text-pink-600 transition-colors">
               서비스 소개
+            </Link>
+            <span className="text-gray-300">|</span>
+            <Link href="/zodiac" className="text-gray-600 hover:text-pink-600 transition-colors">
+              12간지 정보
+            </Link>
+            <span className="text-gray-300">|</span>
+            <Link href="/compatibility" className="text-gray-600 hover:text-pink-600 transition-colors">
+              궁합 가이드
+            </Link>
+            <span className="text-gray-300">|</span>
+            <Link href="/faq" className="text-gray-600 hover:text-pink-600 transition-colors">
+              FAQ
             </Link>
             <span className="text-gray-300">|</span>
             <Link href="/privacy" className="text-gray-600 hover:text-pink-600 transition-colors">

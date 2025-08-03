@@ -1,5 +1,6 @@
 'use client';
 
+import { AdBanner } from '@/components/ui/AdBanner';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Footer } from '@/components/ui/Footer';
@@ -8,8 +9,9 @@ import { Section } from '@/components/ui/Section';
 import { Typography } from '@/components/ui/Typography';
 import { validateYear } from '@/lib/zodiac';
 import { Heart, Sparkles, Star } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const HomePage = () => {
   const router = useRouter();
@@ -17,6 +19,29 @@ const HomePage = () => {
   const [parentYear, setParentYear] = useState('');
   const [errors, setErrors] = useState<{ child?: string; parent?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // 페이지 포커스 시 로딩 상태 초기화
+  useEffect(() => {
+    const handleFocus = () => {
+      setIsLoading(false);
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        setIsLoading(false);
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('pageshow', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('pageshow', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +71,11 @@ const HomePage = () => {
     });
 
     router.push(`/result?${params.toString()}`);
+    
+    // 페이지 이동 후 로딩 상태 초기화 (약간의 지연 후)
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (
@@ -149,6 +179,11 @@ const HomePage = () => {
             </Typography>
           </div>
 
+          {/* 광고 배치 - 입력 폼 아래 */}
+          <div className="mt-8 mx-auto max-w-md">
+            <AdBanner size="medium" placeholder={false} />
+          </div>
+
           {/* 서비스 소개 */}
           <Card className="mt-8 border-gray-200 bg-gray-50 p-6">
             <Typography
@@ -218,6 +253,40 @@ const HomePage = () => {
                   </Typography>
                 </div>
               </div>
+            </div>
+          </Card>
+
+          {/* 추가 정보 링크 */}
+          <Card className="mt-6 border-blue-200 bg-blue-50 p-6">
+            <Typography
+              variant="h3"
+              className="mb-4 text-center text-lg font-semibold text-blue-700"
+            >
+              더 자세히 알아보기
+            </Typography>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Link 
+                href="/zodiac" 
+                className="rounded-lg bg-white p-3 text-center transition-all hover:bg-blue-100 hover:shadow-md"
+              >
+                <Typography className="text-sm font-semibold text-blue-700">
+                  📅 12간지 띠별 정보
+                </Typography>
+                <Typography className="text-xs text-gray-600">
+                  각 띠의 성격과 특징 알아보기
+                </Typography>
+              </Link>
+              <Link 
+                href="/compatibility" 
+                className="rounded-lg bg-white p-3 text-center transition-all hover:bg-blue-100 hover:shadow-md"
+              >
+                <Typography className="text-sm font-semibold text-blue-700">
+                  💕 궁합 가이드
+                </Typography>
+                <Typography className="text-xs text-gray-600">
+                  띠 궁합의 원리와 해석법
+                </Typography>
+              </Link>
             </div>
           </Card>
         </div>

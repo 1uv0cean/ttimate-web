@@ -34,6 +34,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    {
+      url: `${baseUrl}/zodiac`,
+      lastModified: new Date('2025-08-02'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/compatibility`,
+      lastModified: new Date('2025-08-02'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/faq`,
+      lastModified: new Date('2025-08-02'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
     // 연도별 페이지 추가 (주요 연도들)
     ...generateYearlyPages(baseUrl),
   ];
