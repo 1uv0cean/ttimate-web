@@ -14,6 +14,8 @@ import {
   formatCompatibilityScore,
   getCompatibilityColor,
   getGradeDescription,
+  getRelationshipLabels,
+  RelationshipType,
 } from '@/lib/compatibility';
 import { formatYear, getZodiacEmoji, getZodiacInfo } from '@/lib/zodiac';
 import { getDetailedCompatibility } from '@/lib/zodiac-detailed-compatibility';
@@ -43,6 +45,7 @@ function ResultContent() {
 
   const childYear = searchParams.get('child');
   const parentYear = searchParams.get('parent');
+  const relationshipType = (searchParams.get('relationship') as RelationshipType) || 'family';
 
   useEffect(() => {
     if (!childYear || !parentYear) {
@@ -79,7 +82,12 @@ function ResultContent() {
           </Typography>
           <div className="mx-auto max-w-md">
             <Typography variant="muted" className="mb-4 text-gray-500">
-              자녀와 부모님의 띠 궁합을 분석하고 있습니다
+              {relationshipType === 'lover'
+                ? '연인 간의 띠 궁합을 분석하고 있습니다'
+                : relationshipType === 'family'
+                ? '가족 간의 띠 궁합을 분석하고 있습니다'
+                : '친구 간의 띠 궁합을 분석하고 있습니다'
+              }
             </Typography>
             <Progress value={66} className="w-full mb-2" />
             <Typography variant="small" className="text-gray-400">
@@ -96,9 +104,10 @@ function ResultContent() {
 
   const childInfo = getZodiacInfo(childYearNum);
   const parentInfo = getZodiacInfo(parentYearNum);
-  const compatibility = calculateCompatibility(childInfo.animal, parentInfo.animal);
+  const compatibility = calculateCompatibility(childInfo.animal, parentInfo.animal, relationshipType);
   const gradeColors = getCompatibilityColor(compatibility.grade);
   const detailedCompatibility = getDetailedCompatibility(childInfo.animal, parentInfo.animal);
+  const relationshipLabels = getRelationshipLabels(relationshipType);
 
   const handleShare = () => {
     setShareModalOpen(true);
@@ -108,10 +117,10 @@ function ResultContent() {
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
       {/* 동적 메타 태그 */}
       <MetaTags
-        title={`${childYear}년생 자녀와 ${parentYear}년생 부모의 띠 궁합`}
-        description={`${getZodiacEmoji(childInfo.animal)} 자녀와 ${getZodiacEmoji(parentInfo.animal)} 부모의 궁합은 ${compatibility.grade}! 띠메이트에서 상세한 분석을 확인하세요.`}
-        ogImage={`/api/og?child=${childYear}&parent=${parentYear}`}
-        ogUrl={`https://ttimate.com/result?child=${childYear}&parent=${parentYear}`}
+        title={`${childYear}년생 ${relationshipLabels.first}와 ${parentYear}년생 ${relationshipLabels.second}의 띠 궁합`}
+        description={`${getZodiacEmoji(childInfo.animal)} ${relationshipLabels.first}와 ${getZodiacEmoji(parentInfo.animal)} ${relationshipLabels.second}의 궁합은 ${compatibility.grade}! 띠메이트에서 상세한 분석을 확인하세요.`}
+        ogImage={`/api/og?child=${childYear}&parent=${parentYear}&relationship=${relationshipType}`}
+        ogUrl={`https://ttimate.com/result?child=${childYear}&parent=${parentYear}&relationship=${relationshipType}`}
       />
 
       {/* 헤더 */}
@@ -165,7 +174,7 @@ function ResultContent() {
                   {getZodiacEmoji(childInfo.animal).split(' ')[0]}
                 </div>
                 <Typography variant="h3" className="text-blue-800">
-                  {childInfo.animal}띠 자녀
+                  {childInfo.animal}띠 {relationshipLabels.first}
                 </Typography>
                 <Typography variant="small" className="text-blue-600">
                   {formatYear(childYearNum)} ({childInfo.element})
@@ -193,7 +202,7 @@ function ResultContent() {
                   {getZodiacEmoji(parentInfo.animal).split(' ')[0]}
                 </div>
                 <Typography variant="h3" className="text-purple-800">
-                  {parentInfo.animal}띠 부모
+                  {parentInfo.animal}띠 {relationshipLabels.second}
                 </Typography>
                 <Typography variant="small" className="text-purple-600">
                   {formatYear(parentYearNum)} ({parentInfo.element})
@@ -412,12 +421,20 @@ function ResultContent() {
             </Typography>
             <div className="space-y-3 text-sm text-gray-700">
               <Typography>
-                12간지 궁합은 단순히 운세를 예측하는 것이 아니라, 가족 구성원 간의 성격적 특성을 이해하고
-                서로를 존중하는 방법을 찾는 데 도움이 됩니다.
+                {relationshipType === 'lover'
+                  ? '12간지 궁합은 단순히 운세를 예측하는 것이 아니라, 연인 간의 성격적 특성을 이해하고 서로를 사랑하는 방법을 찾는 데 도움이 됩니다.'
+                  : relationshipType === 'family'
+                  ? '12간지 궁합은 단순히 운세를 예측하는 것이 아니라, 가족 구성원 간의 성격적 특성을 이해하고 서로를 존중하는 방법을 찾는 데 도움이 됩니다.'
+                  : '12간지 궁합은 단순히 운세를 예측하는 것이 아니라, 친구 간의 성격적 특성을 이해하고 서로를 존중하는 방법을 찾는 데 도움이 됩니다.'
+                }
               </Typography>
               <Typography>
-                부모와 자녀는 각자의 띠 특성에 따라 다른 가치관과 생활 방식을 가질 수 있습니다.
-                이러한 차이를 이해하면 더 풍성하고 행복한 가족 관계를 만들어갈 수 있습니다.
+                {relationshipType === 'lover'
+                  ? '두 사람은 각자의 띠 특성에 따라 다른 연애 스타일과 가치관을 가질 수 있습니다. 이러한 차이를 이해하면 더 깊고 달콤한 사랑을 만들어갈 수 있습니다.'
+                  : relationshipType === 'family'
+                  ? '가족 구성원은 각자의 띠 특성에 따라 다른 가치관과 생활 방식을 가질 수 있습니다. 이러한 차이를 이해하면 더 풍성하고 행복한 가족 관계를 만들어갈 수 있습니다.'
+                  : '친구는 각자의 띠 특성에 따라 다른 가치관과 관심사를 가질 수 있습니다. 이러한 차이를 이해하면 더 깊고 오래 지속되는 우정을 만들어갈 수 있습니다.'
+                }
               </Typography>
               <Typography className="mt-3 rounded-lg bg-white p-3 text-xs text-gray-600">
                 ※ 본 궁합 결과는 전통적인 12간지 해석에 기반한 것으로, 참고용으로만 활용해주세요.
@@ -448,6 +465,7 @@ function ResultContent() {
         childAnimal={childInfo.animal}
         parentAnimal={parentInfo.animal}
         compatibilityGrade={compatibility.grade}
+        relationshipType={relationshipType}
       />
     </div>
   );
