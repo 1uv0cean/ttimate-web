@@ -51,6 +51,7 @@ export interface SelectProps
   success?: boolean;
   searchable?: boolean;
   required?: boolean;
+  portal?: boolean; // Portal mode for DataTable usage
 }
 
 const Select = forwardRef<HTMLDivElement, SelectProps>(
@@ -73,6 +74,7 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
       success,
       searchable = false,
       required,
+      portal = false,
       ...props
     },
     ref,
@@ -104,16 +106,21 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
       setSearchQuery('');
     };
 
+    const updatePosition = () => {
+      if (selectRef.current) {
+        const rect = selectRef.current.getBoundingClientRect();
+        setDropdownPosition({
+          top: rect.bottom + 4,
+          left: rect.left,
+          width: rect.width,
+        });
+      }
+    };
+
     const handleToggle = () => {
       if (!disabled && !loading) {
-        if (!isOpen && selectRef.current) {
-          // Calculate dropdown position
-          const rect = selectRef.current.getBoundingClientRect();
-          setDropdownPosition({
-            top: rect.bottom + window.scrollY,
-            left: rect.left + window.scrollX,
-            width: rect.width,
-          });
+        if (!isOpen) {
+          updatePosition();
         }
         setIsOpen(!isOpen);
       }
@@ -123,11 +130,13 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
       setSearchQuery(e.target.value);
     };
 
-    // Close dropdown when clicking outside
+    // Handle events based on portal mode
     useEffect(() => {
+      if (!isOpen) return;
+
       const handleClickOutside = (event: MouseEvent) => {
         if (
-          selectRef.current && 
+          selectRef.current &&
           !selectRef.current.contains(event.target as Node) &&
           dropdownRef.current &&
           !dropdownRef.current.contains(event.target as Node)
@@ -137,13 +146,26 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
         }
       };
 
-      if (isOpen) {
-        document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
+
+      // Only add scroll listener in portal mode
+      if (portal) {
+        const handleScroll = () => {
+          updatePosition();
+        };
+
+        window.addEventListener('scroll', handleScroll, true);
+
         return () => {
+          window.removeEventListener('scroll', handleScroll, true);
           document.removeEventListener('mousedown', handleClickOutside);
         };
       }
-    }, [isOpen]);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [isOpen, portal]);
 
     return (
       <div className="space-y-1">
@@ -206,13 +228,15 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
               {leftIcon}
             </div>
           )}
+          {/* Dropdown - Portal mode (for DataTable) */}
           {isOpen &&
             !disabled &&
             !loading &&
+            portal &&
             createPortal(
               <div
                 ref={dropdownRef}
-                className="border-input bg-background fixed z-[9999] mt-1 rounded-md border shadow-lg"
+                className="border-input bg-background fixed z-[9999] rounded-md border shadow-lg"
                 style={{
                   top: dropdownPosition.top,
                   left: dropdownPosition.left,
@@ -263,6 +287,56 @@ const Select = forwardRef<HTMLDivElement, SelectProps>(
               </div>,
               document.body,
             )}
+
+          {/* Dropdown - Normal mode (attached to parent) */}
+          {isOpen && !disabled && !loading && !portal && (
+            <div
+              ref={dropdownRef}
+              className="border-input bg-background absolute top-full right-0 left-0 z-50 mt-1 rounded-md border shadow-lg"
+            >
+              {searchable && (
+                <div className="border-input border-b p-2">
+                  <input
+                    type="text"
+                    placeholder="Search options..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="border-input focus:ring-ring w-full rounded border bg-transparent px-2 py-1 text-sm focus:ring-1 focus:outline-none"
+                    autoFocus
+                  />
+                </div>
+              )}
+
+              <div className="max-h-60 overflow-auto p-1">
+                {filteredOptions.length === 0 ? (
+                  <div className="text-muted-foreground px-2 py-1 text-sm">No options found</div>
+                ) : (
+                  filteredOptions.map((option) => (
+                    <div
+                      key={option.value}
+                      className={cn(
+                        'hover:bg-accent hover:text-accent-foreground flex cursor-pointer items-center rounded px-2 py-1 text-sm',
+                        option.disabled && 'cursor-not-allowed opacity-50',
+                        option.value === (value || internalValue) &&
+                          'bg-accent text-accent-foreground',
+                      )}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        if (!option.disabled) {
+                          handleSelect(option.value);
+                        }
+                      }}
+                    >
+                      <span className="flex-1 truncate">{option.label}</span>
+                      {option.value === (value || internalValue) && (
+                        <Check className="ml-2 h-4 w-4" />
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {(error || helperText) && (
