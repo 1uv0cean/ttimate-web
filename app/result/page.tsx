@@ -1,6 +1,6 @@
 'use client';
 
-import { LoadingAd } from '@/components/ui/AdSenseAd';
+import { AdBanner } from '@/components/ui/AdBanner';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -79,9 +79,12 @@ function ResultContent() {
           </Typography>
           <div className="mx-auto max-w-md">
             <Typography variant="muted" className="mb-4 text-gray-500">
-              분석 데이터를 준비하고 있습니다...
+              자녀와 부모님의 띠 궁합을 분석하고 있습니다
             </Typography>
-            <LoadingAd />
+            <Progress value={66} className="w-full mb-2" />
+            <Typography variant="small" className="text-gray-400">
+              데이터 처리 중...
+            </Typography>
           </div>
           <Typography variant="small" className="mt-4 text-gray-400">
             잠시만 기다려주세요...
@@ -252,6 +255,11 @@ function ResultContent() {
               </Typography>
             </div>
           </Card>
+
+          {/* 광고 배치 - 컨텐츠 중간 */}
+          <div className="mx-auto max-w-md">
+            <AdBanner size="medium" placeholder={false} />
+          </div>
 
           {/* 장점과 도전 과제 */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

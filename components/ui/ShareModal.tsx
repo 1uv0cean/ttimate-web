@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dialog } from './Dialog';
 import { Button } from './Button';
 import { Typography } from './Typography';
-import { InterstitialAd } from './AdBanner';
-import { Copy, MessageCircle, X } from 'lucide-react';
+import { Copy, MessageCircle } from 'lucide-react';
 import { getZodiacEmoji, type ZodiacAnimal } from '@/lib/zodiac';
 
 interface ShareModalProps {
@@ -33,8 +32,6 @@ export const ShareModal = ({
   parentAnimal,
   compatibilityGrade
 }: ShareModalProps) => {
-  const [showAd, setShowAd] = useState(true);
-  const [adClosed, setAdClosed] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const shareUrl = typeof window !== 'undefined' 
@@ -49,10 +46,6 @@ export const ShareModal = ({
     }
   }, []);
 
-  const handleAdClose = () => {
-    setShowAd(false);
-    setAdClosed(true);
-  };
 
   const handleKakaoShare = () => {
     // 개발 환경에서는 모바일 환경 시뮬레이션
@@ -139,31 +132,18 @@ export const ShareModal = ({
   };
 
   const handleClose = () => {
-    setShowAd(true);
-    setAdClosed(false);
     setCopied(false);
     onClose();
   };
 
   return (
-    <>
-      {/* 전면 광고 */}
-      {isOpen && showAd && (
-        <InterstitialAd
-          isVisible={showAd}
-          onClose={handleAdClose}
-          duration={5}
-        />
-      )}
-
-      {/* 공유 옵션 모달 */}
-      <Dialog
-        open={isOpen && adClosed}
-        onOpenChange={handleClose}
-        title="결과 공유하기"
-        description="띠 궁합 결과를 친구들과 공유해보세요!"
-        size="sm"
-      >
+    <Dialog
+      open={isOpen}
+      onOpenChange={handleClose}
+      title="결과 공유하기"
+      description="띠 궁합 결과를 친구들과 공유해보세요!"
+      size="sm"
+    >
         <div className="space-y-3">
           {/* 카카오톡 공유 */}
           <Button
@@ -202,7 +182,6 @@ export const ShareModal = ({
             </Typography>
           </div>
         </div>
-      </Dialog>
-    </>
+    </Dialog>
   );
 };
