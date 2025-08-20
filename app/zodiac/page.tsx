@@ -150,8 +150,8 @@ const ZodiacPage = () => {
           </div>
 
           {/* 광고 배치 - 콘텐츠 중간 */}
-          <div className="mx-auto mt-8 max-w-md">
-            <AdBanner size="medium" placeholder={false} />
+          <div className="mt-8 w-full">
+            <AdBanner size="medium" placeholder={false} className="mx-auto" />
           </div>
 
           {/* 추가 정보 섹션 */}

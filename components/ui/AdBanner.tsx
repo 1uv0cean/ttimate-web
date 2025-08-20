@@ -50,15 +50,15 @@ export const AdBanner = ({
   }, [placeholder]);
 
   const sizeClasses = {
-    small: 'h-24 max-w-sm',
-    medium: 'h-32 max-w-md',
-    large: 'h-48 max-w-2xl',
+    small: 'min-h-[100px] sm:min-h-[120px]',
+    medium: 'min-h-[90px] sm:min-h-[120px] md:min-h-[150px]',
+    large: 'min-h-[150px] sm:min-h-[200px] md:min-h-[250px]',
   };
 
   if (placeholder) {
     return (
       <Card
-        className={`${sizeClasses[size]} flex w-full items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50 ${className}`}
+        className={`${sizeClasses[size]} flex w-full items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50 overflow-hidden ${className}`}
       >
         <div className="p-4 text-center">
           <Typography variant="small" className="mb-1 text-gray-400">
@@ -78,25 +78,22 @@ export const AdBanner = ({
     return AD_SLOTS[size];
   };
 
-  // 광고 스타일 설정
+  // 광고 스타일 설정 - 반응형
   const getAdStyle = () => {
-    const baseStyle = { display: 'block' };
-    switch (size) {
-      case 'small':
-        return { ...baseStyle, width: '320px', height: '100px' };
-      case 'medium':
-        return { ...baseStyle, width: '728px', height: '90px' };
-      case 'large':
-        return { ...baseStyle, width: '970px', height: '250px' };
-      default:
-        return baseStyle;
-    }
+    const baseStyle = { 
+      display: 'block',
+      width: '100%',
+      maxWidth: '100%',
+      height: 'auto',
+      minHeight: '50px'
+    };
+    return baseStyle;
   };
 
   return (
-    <div ref={adContainerRef} className={`${sizeClasses[size]} w-full ${className}`}>
+    <div ref={adContainerRef} className={`${sizeClasses[size]} w-full overflow-hidden ${className}`}>
       {!adLoaded ? (
-        <Card className="flex h-full items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50">
+        <Card className="flex h-full w-full items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50">
           <div className="p-4 text-center">
             <div className="animate-pulse">
               <Typography variant="small" className="text-gray-400">
@@ -106,13 +103,14 @@ export const AdBanner = ({
           </div>
         </Card>
       ) : (
-        <div className="h-full w-full overflow-hidden rounded-lg bg-white">
+        <div className="relative h-full w-full overflow-hidden rounded-lg bg-white">
           <AdSenseAd
             slot={getAdSlot()}
-            format="auto"
+            format="fluid"
             responsive={true}
             style={getAdStyle()}
-            className="w-full h-full"
+            className="w-full"
+            layoutKey="-fb+5w+4e-db+86"
           />
         </div>
       )}
@@ -159,7 +157,7 @@ export const InterstitialAd = ({ isVisible, onClose, duration = 5 }: Interstitia
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-md rounded-lg bg-white shadow-2xl">
+      <div className="relative w-full max-w-lg rounded-lg bg-white shadow-2xl overflow-hidden">
         {/* 닫기 버튼 */}
         {canClose && (
           <button

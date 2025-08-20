@@ -198,8 +198,8 @@ const HomePage = () => {
           </div>
 
           {/* 광고 배치 - 입력 폼 아래 */}
-          <div className="mt-8 mx-auto max-w-md">
-            <AdBanner size="medium" placeholder={false} />
+          <div className="mt-8 w-full">
+            <AdBanner size="medium" placeholder={false} className="mx-auto" />
           </div>
 
           {/* 서비스 소개 */}

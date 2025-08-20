@@ -266,8 +266,8 @@ function ResultContent() {
           </Card>
 
           {/* 광고 배치 - 컨텐츠 중간 */}
-          <div className="mx-auto max-w-md">
-            <AdBanner size="medium" placeholder={false} />
+          <div className="w-full">
+            <AdBanner size="medium" placeholder={false} className="mx-auto" />
           </div>
 
           {/* 장점과 도전 과제 */}

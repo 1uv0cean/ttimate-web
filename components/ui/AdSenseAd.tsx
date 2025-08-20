@@ -8,6 +8,7 @@ interface AdSenseAdProps {
   responsive?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  layoutKey?: string;
 }
 
 declare global {
@@ -25,6 +26,7 @@ export const AdSenseAd: React.FC<AdSenseAdProps> = ({
   responsive = true,
   className = '',
   style = { display: 'block' },
+  layoutKey,
 }) => {
   const adRef = useRef<HTMLDivElement>(null);
   const adId = `ad-${slot}`;
@@ -82,14 +84,20 @@ export const AdSenseAd: React.FC<AdSenseAdProps> = ({
   }, [slot, adId]);
 
   return (
-    <div ref={adRef} className={`adsense-container ${className}`}>
+    <div ref={adRef} className={`adsense-container relative ${className}`}>
       <ins
         className="adsbygoogle"
-        style={style}
+        style={{
+          ...style,
+          display: 'block',
+          width: '100%',
+          height: 'auto',
+        }}
         data-ad-client="ca-pub-1427543231397985"
         data-ad-slot={slot}
         data-ad-format={format}
         data-full-width-responsive={responsive.toString()}
+        {...(layoutKey && { 'data-ad-layout-key': layoutKey })}
       />
     </div>
   );
@@ -101,12 +109,13 @@ export const AdUnits = {
   LOADING: '4869775532',
 } as const;
 
-// 로딩 광고 컴포넌트
+// 로딩 광고 컴포넌트 - 반응형
 export const LoadingAd = () => (
   <AdSenseAd
     slot={AdUnits.LOADING}
-    format="rectangle"
-    className="mx-auto"
-    style={{ display: 'block', width: '300px', height: '250px' }}
+    format="fluid"
+    className="mx-auto w-full max-w-sm sm:max-w-md"
+    style={{ display: 'block', minHeight: '100px' }}
+    layoutKey="-fb+5w+4e-db+86"
   />
 );
