@@ -50,9 +50,9 @@ export const AdBanner = ({
   }, [placeholder]);
 
   const sizeClasses = {
-    small: 'min-h-[100px] sm:min-h-[120px]',
-    medium: 'min-h-[90px] sm:min-h-[120px] md:min-h-[150px]',
-    large: 'min-h-[150px] sm:min-h-[200px] md:min-h-[250px]',
+    small: 'min-h-[100px] sm:min-h-[120px] min-w-[320px]',
+    medium: 'min-h-[90px] sm:min-h-[120px] md:min-h-[150px] min-w-[320px]',
+    large: 'min-h-[150px] sm:min-h-[200px] md:min-h-[250px] min-w-[320px]',
   };
 
   if (placeholder) {
@@ -83,11 +83,20 @@ export const AdBanner = ({
     const baseStyle = { 
       display: 'block',
       width: '100%',
-      maxWidth: '100%',
-      height: 'auto',
-      minHeight: '50px'
+      minWidth: '320px',
+      minHeight: '100px'
     };
-    return baseStyle;
+    
+    switch (size) {
+      case 'small':
+        return { ...baseStyle, minHeight: '100px' };
+      case 'medium':
+        return { ...baseStyle, minHeight: '90px' };
+      case 'large':
+        return { ...baseStyle, minHeight: '250px' };
+      default:
+        return baseStyle;
+    }
   };
 
   return (
@@ -103,14 +112,13 @@ export const AdBanner = ({
           </div>
         </Card>
       ) : (
-        <div className="relative h-full w-full overflow-hidden rounded-lg bg-white">
+        <div className="relative min-h-[100px] w-full min-w-[320px] overflow-hidden rounded-lg bg-white">
           <AdSenseAd
             slot={getAdSlot()}
-            format="fluid"
+            format="auto"
             responsive={true}
             style={getAdStyle()}
             className="w-full"
-            layoutKey="-fb+5w+4e-db+86"
           />
         </div>
       )}

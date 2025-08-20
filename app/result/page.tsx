@@ -266,7 +266,7 @@ function ResultContent() {
           </Card>
 
           {/* 광고 배치 - 컨텐츠 중간 */}
-          <div className="w-full">
+          <div className="w-full min-w-[320px]">
             <AdBanner size="medium" placeholder={false} className="mx-auto" />
           </div>
 
