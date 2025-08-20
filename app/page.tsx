@@ -12,7 +12,7 @@ import { validateYear } from '@/lib/zodiac';
 import { Heart, Sparkles, Star, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const HomePage = () => {
   const router = useRouter();
@@ -80,7 +80,7 @@ const HomePage = () => {
     });
 
     router.push(`/result?${params.toString()}`);
-    
+
     // 페이지 이동 후 로딩 상태 초기화 (약간의 지연 후)
     setTimeout(() => {
       setIsLoading(false);
@@ -149,7 +149,13 @@ const HomePage = () => {
                   />
 
                   <Input
-                    label={relationshipType === 'family' ? "자녀 생년" : relationshipType === 'lover' ? "나의 생년" : "본인 생년"}
+                    label={
+                      relationshipType === 'family'
+                        ? '자녀 생년'
+                        : relationshipType === 'lover'
+                          ? '나의 생년'
+                          : '본인 생년'
+                    }
                     type="number"
                     placeholder="예: 2000"
                     value={childYear}
@@ -163,7 +169,13 @@ const HomePage = () => {
                   />
 
                   <Input
-                    label={relationshipType === 'family' ? "부모 생년" : relationshipType === 'lover' ? "상대방 생년" : "상대방 생년"}
+                    label={
+                      relationshipType === 'family'
+                        ? '부모 생년'
+                        : relationshipType === 'lover'
+                          ? '상대방 생년'
+                          : '상대방 생년'
+                    }
                     type="number"
                     placeholder="예: 1998"
                     value={parentYear}
@@ -193,12 +205,11 @@ const HomePage = () => {
           <div className="mt-8 text-center">
             <Typography variant="small" className="text-gray-500">
               * 양력 기준으로 계산됩니다
-              <br />* 결과 확인을 위해 잠시 광고가 표시될 수 있습니다
             </Typography>
           </div>
 
           {/* 광고 배치 - 입력 폼 아래 */}
-          <div className="mt-8 w-full">
+          <div className="mt-8 w-full min-w-[320px]">
             <AdBanner size="medium" placeholder={false} className="mx-auto" />
           </div>
 
@@ -212,20 +223,18 @@ const HomePage = () => {
             </Typography>
             <div className="space-y-3 text-sm text-gray-600">
               <Typography>
-                {relationshipType === 'lover' 
+                {relationshipType === 'lover'
                   ? '띠메이트는 동양의 전통적인 12간지 띠를 기반으로 연인 간의 성격적 조화와 애정 궁합을 분석하는 서비스입니다.'
                   : relationshipType === 'family'
-                  ? '띠메이트는 동양의 전통적인 12간지 띠를 기반으로 가족 구성원 간의 성격적 조화를 분석하는 서비스입니다.'
-                  : '띠메이트는 동양의 전통적인 12간지 띠를 기반으로 친구나 지인 간의 성격적 조화와 우정을 분석하는 서비스입니다.'
-                }
+                    ? '띠메이트는 동양의 전통적인 12간지 띠를 기반으로 가족 구성원 간의 성격적 조화를 분석하는 서비스입니다.'
+                    : '띠메이트는 동양의 전통적인 12간지 띠를 기반으로 친구나 지인 간의 성격적 조화와 우정을 분석하는 서비스입니다.'}
               </Typography>
               <Typography>
                 {relationshipType === 'lover'
                   ? '각 띠가 가진 고유한 성격적 특성과 오행(五行) 이론을 바탕으로, 연인 관계를 더 깊이 이해하고 서로를 사랑하는 데 도움을 드립니다.'
                   : relationshipType === 'family'
-                  ? '각 띠가 가진 고유한 성격적 특성과 오행(五行) 이론을 바탕으로, 가족 관계를 더 깊이 이해하고 서로를 존중하는 데 도움을 드립니다.'
-                  : '각 띠가 가진 고유한 성격적 특성과 오행(五行) 이론을 바탕으로, 친구 관계를 더 깊이 이해하고 서로를 존중하는 데 도움을 드립니다.'
-                }
+                    ? '각 띠가 가진 고유한 성격적 특성과 오행(五行) 이론을 바탕으로, 가족 관계를 더 깊이 이해하고 서로를 존중하는 데 도움을 드립니다.'
+                    : '각 띠가 가진 고유한 성격적 특성과 오행(五行) 이론을 바탕으로, 친구 관계를 더 깊이 이해하고 서로를 존중하는 데 도움을 드립니다.'}
               </Typography>
               <div className="mt-4 rounded-lg bg-white p-4">
                 <Typography variant="h4" className="mb-2 font-semibold text-gray-700">
@@ -255,7 +264,8 @@ const HomePage = () => {
                 </div>
                 <div>
                   <Typography className="text-sm text-gray-700">
-                    관계 유형(연인, 가족, 지인)을 선택하고 두 사람의 태어난 연도를 입력해주세요. (양력 기준)
+                    관계 유형(연인, 가족, 지인)을 선택하고 두 사람의 태어난 연도를 입력해주세요.
+                    (양력 기준)
                   </Typography>
                 </div>
               </div>
@@ -278,9 +288,8 @@ const HomePage = () => {
                     {relationshipType === 'lover'
                       ? '연인 관계에 맞는 궁합 결과와 함께 더 달콤한 사랑을 위한 조언을 확인하세요.'
                       : relationshipType === 'family'
-                      ? '가족 관계에 맞는 궁합 결과와 함께 더 화목한 가정을 위한 조언을 확인하세요.'
-                      : '친구 관계에 맞는 궁합 결과와 함께 더 깊은 우정을 위한 조언을 확인하세요.'
-                    }
+                        ? '가족 관계에 맞는 궁합 결과와 함께 더 화목한 가정을 위한 조언을 확인하세요.'
+                        : '친구 관계에 맞는 궁합 결과와 함께 더 깊은 우정을 위한 조언을 확인하세요.'}
                   </Typography>
                 </div>
               </div>
@@ -296,8 +305,8 @@ const HomePage = () => {
               더 자세히 알아보기
             </Typography>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Link 
-                href="/zodiac" 
+              <Link
+                href="/zodiac"
                 className="rounded-lg bg-white p-3 text-center transition-all hover:bg-blue-100 hover:shadow-md"
               >
                 <Typography className="text-sm font-semibold text-blue-700">
@@ -307,16 +316,14 @@ const HomePage = () => {
                   각 띠의 성격과 특징 알아보기
                 </Typography>
               </Link>
-              <Link 
-                href="/compatibility" 
+              <Link
+                href="/compatibility"
                 className="rounded-lg bg-white p-3 text-center transition-all hover:bg-blue-100 hover:shadow-md"
               >
                 <Typography className="text-sm font-semibold text-blue-700">
                   💕 궁합 가이드
                 </Typography>
-                <Typography className="text-xs text-gray-600">
-                  띠 궁합의 원리와 해석법
-                </Typography>
+                <Typography className="text-xs text-gray-600">띠 궁합의 원리와 해석법</Typography>
               </Link>
             </div>
           </Card>

@@ -173,7 +173,7 @@ const CompatibilityPage = () => {
           </div>
 
           {/* 광고 배치 - 콘텐츠 중간 */}
-          <div className="mb-8 w-full">
+          <div className="mb-8 w-full min-w-[320px]">
             <AdBanner size="medium" placeholder={false} className="mx-auto" />
           </div>
 

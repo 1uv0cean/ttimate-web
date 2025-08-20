@@ -84,14 +84,15 @@ export const AdSenseAd: React.FC<AdSenseAdProps> = ({
   }, [slot, adId]);
 
   return (
-    <div ref={adRef} className={`adsense-container relative ${className}`}>
+    <div ref={adRef} className={`adsense-container relative min-w-[320px] ${className}`} style={{ minHeight: '100px' }}>
       <ins
         className="adsbygoogle"
         style={{
-          ...style,
           display: 'block',
+          minWidth: '320px',
           width: '100%',
-          height: 'auto',
+          minHeight: '100px',
+          ...style,
         }}
         data-ad-client="ca-pub-1427543231397985"
         data-ad-slot={slot}
@@ -113,9 +114,9 @@ export const AdUnits = {
 export const LoadingAd = () => (
   <AdSenseAd
     slot={AdUnits.LOADING}
-    format="fluid"
+    format="auto"
     className="mx-auto w-full max-w-sm sm:max-w-md"
-    style={{ display: 'block', minHeight: '100px' }}
-    layoutKey="-fb+5w+4e-db+86"
+    style={{ display: 'block', minHeight: '250px', minWidth: '320px' }}
+    responsive={true}
   />
 );
